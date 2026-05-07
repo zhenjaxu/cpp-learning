@@ -125,3 +125,31 @@ test: ThreadPool.hpp:23: ThreadPool::ThreadPool(size_t): Assertion `num<=maxNum'
 Aborted (core dumped)
 ```
 這樣應該算成功了吧
+嘿嘿，當然不是
+assert在Release模式下會自動消失，比如加-02優化或加-DNDEBUG，就等於沒有限制了
+故而嘗試把斷言換成拋出異常，表示參數不合理
+```cpp
+if(num>maxNum)
+    {
+        throw std::invalid_argument("thread number exceeds maximum limit");
+    }
+```
+運行後結果如下
+```shell
+terminate called after throwing an instance of 'std::invalid_argument'
+  what():  thread number exceeds maximum limit
+Aborted (core dumped)
+```        
+或則更簡單的方法就是，直接不報錯，直接用最大限制，暗渡陳倉
+```cpp
+if(num>maxNum)
+    {
+        num=maxNum;
+    }
+```
+## 編譯運行
+使用g++編譯運行
+```shell
+g++ -std=c++11 -pthread main.cpp -o test
+./test
+```

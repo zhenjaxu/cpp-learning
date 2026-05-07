@@ -6,7 +6,6 @@
 #include <condition_variable>
 #include <queue>
 #include <future>
-#include <assert.h>
 
 class ThreadPool
 {
@@ -20,7 +19,11 @@ private:
 public:
     explicit ThreadPool(size_t num):stop(false)
     {
-        assert(num<=maxNum);
+        if(num>maxNum)
+        {
+            throw std::invalid_argument("thread number exceeds maximum limit");
+            // num=maxNum;
+        }
         for(size_t i=0;i<num;++i)
         {
             workers.emplace_back([this]{

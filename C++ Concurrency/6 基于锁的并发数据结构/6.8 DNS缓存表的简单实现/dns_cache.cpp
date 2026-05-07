@@ -23,5 +23,5 @@ public:
     }
 };
 
-// 該表同樣用mutex直接管理整個map,併發程度固然受限
-// 基於sharedmutex,對可併發的讀取操作使用sharedlock，而對不可併發的寫操作使用lockguard
+// 该表同样用mutex直接管理整个map,并发程度固然受限
+// 基于sharedmutex,对可并发的读取操作使用sharedlock，而对不可并发的写操作使用lockguard

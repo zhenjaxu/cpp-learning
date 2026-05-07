@@ -39,7 +39,7 @@ public:
     }
 };
 
-// head.get返回節點地址與tail比較
-// 不難發現，在加入dummynode（tail所指的）後，tail不再指向尾節點，失去back的能力，以提高併發程度
-// makeshared一次性完成內存和控制塊的分配，比ptr（new T()）（兩次內存分配）更快更安全，減少內存碎片化
-// 那headmutex和tailmutex要在什麼時候上鎖解鎖才能使併發程度最高?
+// head.get返回节点地址与tail比较
+// 不难发现，在加入dummynode（tail所指的）后，tail不再指向尾节点，失去back的能力，以提高并发程度
+// makeshared一次性完成内存和控制块的分配，比ptr（new T()）（两次内存分配）更快更安全，减少内存碎片化
+// 那headmutex和tailmutex要在什么时候上锁解锁才能使并发程度最高?

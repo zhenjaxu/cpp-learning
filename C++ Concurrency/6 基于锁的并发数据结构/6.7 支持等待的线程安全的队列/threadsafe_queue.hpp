@@ -48,9 +48,9 @@ private:
     std::unique_ptr<node> wait_pop_head(T& value)
     {
         std::unique_lock<std::mutex> head_lock(wait_for_data());
-        // value 的賦值在 pop_head 之前，這很關鍵
-        // 如果賦值拋出異常，但 pop_head 已經發生，那原來的數據就會丟失
-        // 但如果在之前就拋出異常，則此時的數據還沒有發生改變，故異常安全
+        // value 的赋值在 pop_head 之前，这很关键
+        // 如果赋值抛出异常，但 pop_head 已经发生，那原来的数据就会丢失
+        // 但如果在之前就抛出异常，则此时的数据还没有发生改变，故异常安全
         value = std::move(*head->data);
         return pop_head();
     }
@@ -97,9 +97,9 @@ public:
             tail->next = std::move(p);
             tail = new_tail;
         }
-        // 鎖外喚醒，提高效率
-        // 在該線程準備喚醒的時候，另一個線程已經拿到鎖
-        // 如果鎖內喚醒，再解鎖，此時另一個線程已經被喚醒，但鎖還在原線程上，故會進入等待
+        // 锁外唤醒，提高效率
+        // 在该线程准备唤醒的时候，另一个线程已经拿到锁
+        // 如果锁内唤醒，再解锁，此时另一个线程已经被唤醒，但锁还在原线程上，故会进入等待
         data_cond.notify_one();
     }
 

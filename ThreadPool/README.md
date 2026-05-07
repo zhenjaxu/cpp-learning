@@ -102,3 +102,26 @@ auto submit(F&& f, Args... args)
 }
 ```
 這裏一定要等所有worker全部聯結，否則程序會終止
+## 功能添加
+### 線程池線程數量限制
+慾實現限制功能，肯定是從構造函數出發
+比如說這個線程池的最大線程數量爲10，如果超過10我就拋出個異常或者斷言
+```cpp
+#include <assert.h>
+size_t maxNum=10;
+assert(num<=maxNum);
+```
+然後測試一下
+```cpp
+ThreadPool pool(10);
+```
+爲10的時候可以正常運行，且速度比4線程的更快
+```cpp
+ThreadPool pool(11);
+```
+爲11的時候觸發斷言
+```shell
+test: ThreadPool.hpp:23: ThreadPool::ThreadPool(size_t): Assertion `num<=maxNum' failed.
+Aborted (core dumped)
+```
+這樣應該算成功了吧

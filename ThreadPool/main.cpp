@@ -9,7 +9,9 @@ int compute(int a, int b)
 
 int main()
 {
-    ThreadPool pool(4);
+    // ThreadPool pool(4);
+    // ThreadPool pool(10);
+    ThreadPool pool(11);
     std::vector<std::thread> printers;
     std::mutex mut;
     for(int i=0;i<100;++i)

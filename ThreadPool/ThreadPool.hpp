@@ -6,6 +6,7 @@
 #include <condition_variable>
 #include <queue>
 #include <future>
+#include <assert.h>
 
 class ThreadPool
 {
@@ -15,9 +16,11 @@ private:
     bool stop;
     std::mutex mut;
     std::condition_variable cv;
+    size_t maxNum=10;
 public:
     explicit ThreadPool(size_t num):stop(false)
     {
+        assert(num<=maxNum);
         for(size_t i=0;i<num;++i)
         {
             workers.emplace_back([this]{

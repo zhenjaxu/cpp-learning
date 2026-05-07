@@ -5,12 +5,18 @@
 
 ## 線程池的結構
 ### 線程池，管理消費者
+用vector，線程池支持任意數量，可以擴容
+```cpp
 std::vector<std::thread> workers;
+```
 ### 任務隊列，獲取任務
-這裏就很巧妙了，使用void()的函數去執行封裝好的任意傳參任意返回的packagetask
+這裏就很巧妙了，使用void()的函數去執行封裝好的任意傳參任意返回的packagedtask
 既兼容各種函數模板
+```cpp
 std::queue<std::function<void()>> tasks;
+```
 又不影響構造函數的實現，妙哉
+```cpp
 explicit ThreadPool(size_t num):stop(false)
 {
     for(size_t i=0;i<num;++i)
@@ -31,20 +37,34 @@ explicit ThreadPool(size_t num):stop(false)
         });
     }
 }
-packagetask不可拷貝，故而使用sharedptr指針，十分巧妙
+```
+packagedtask不可拷貝，故而使用sharedptr指針，十分巧妙
+```cpp
 tasks.emplace([task_ptr]{(*task_ptr)();});
+```
 如是這樣，問題大了，task析構後直接完蛋
+```cpp
 tasks.emplace([&task]{task();});
+```
 如是這樣，taskptr析構後，引用計數爲0，故而同樣完蛋
+```cpp
 tasks.emplace([&task_ptr]{(*task_ptr)();});
+```
 只有sharedptr拷貝之後，哪怕原本的ptr析構了，引用計數還在，任務就還在
+```cpp
 tasks.emplace([=task_ptr]{(*task_ptr)();});
+```
 ### 一把大鎖，保護tasks和stop
 併發程度會低一些
+```cpp
 std::mutex mut;
+```
 ### 條件變量
+```cpp
 std::condition_variable cv;
+```
 在submit（獲取任務）後，喚醒一個線程消費
+```cpp
 template<typename F, typename... Args>
 auto submit(F&& f, Args... args)
     ->std::future<decltype(f(args...))>
@@ -62,7 +82,9 @@ auto submit(F&& f, Args... args)
     cv.notify_one();
     return result;
 }
+```
 在stop後，喚醒所有消費者，趕緊完工下班
+```cpp
 ~ThreadPool()
 {
     {
@@ -78,4 +100,5 @@ auto submit(F&& f, Args... args)
         }
     }
 }
+```
 這裏一定要等所有worker全部聯結，否則程序會終止

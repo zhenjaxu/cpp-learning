@@ -61,6 +61,16 @@ Bullet* b5=pool.acquire();  // 复用了b2的内存
 std::cout<<"Reused bullet at address: "<<b5<<", old was: "<<b2<<"\n";
 std::cout<<"b5 id: "<<b5->id<<"(should be 2, unless you reset it)\n";
 ```
+在终端进行编译测试。测试结果，b5和b2的地址是一样的。说明内存确实复用了。
+```shell
+g++ -std=c++11 test_pool.cpp -o test
+./test
+```
+```shell
+Pool empty! Connect spawn.
+Reused bullet at address: 0x1f6990067ac, old was: 0x1f6990067ac
+b5 id: 2(should be 2, unless you reset it)
+```
 
 ## 总结
 对象池通过模板推导，可以接受各种类型的对象（结构体），通过预分配和指针，实现快速内存分配和内存管理，提高游戏性能。

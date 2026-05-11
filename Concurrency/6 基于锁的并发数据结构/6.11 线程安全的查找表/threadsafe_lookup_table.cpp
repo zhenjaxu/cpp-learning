@@ -96,6 +96,25 @@ public:
     {
         get_bucket(key).remove_mapping(key);
     }
+
+    // 6.12 新增数据快照功能
+    std::map<Key, Value> get_map(){
+        std::vector<std::unique_lock<std::shared_mutex>> locks;
+        for(unsigned i=0;i<buckets.size();++i){     // 按固定顺序加锁，避免死锁
+            locks.push_back(
+                std::unique_lock<std::shared_mutex>(buckets[i].mutex);
+            );
+        }
+        std::map<Key, Value> res;
+        for(unsigned i=0; i<buckets.size();++i){
+            for(bucket_iterator it=buckers[i].data.begin();
+                it!=buckets[i].data.end();
+                ++it){
+                    res.insert(*it);
+            }
+        }
+        return res;
+    }
 };
 
 // 异常安全：

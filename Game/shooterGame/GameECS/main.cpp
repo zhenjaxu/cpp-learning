@@ -19,4 +19,6 @@ int main(){
     for(size_t i=1;i<ecs.entityCount;++i){
         ecs.checkCollision(0, i);
     }
+
+    return 0;
 }

@@ -102,12 +102,12 @@ public:
         std::vector<std::unique_lock<std::shared_mutex>> locks;
         for(unsigned i=0;i<buckets.size();++i){     // 按固定顺序加锁，避免死锁
             locks.push_back(
-                std::unique_lock<std::shared_mutex>(buckets[i].mutex);
+                std::unique_lock<std::shared_mutex>(buckets[i]->mutex);
             );
         }
         std::map<Key, Value> res;
         for(unsigned i=0; i<buckets.size();++i){
-            for(bucket_iterator it=buckers[i].data.begin();
+            for(bucket_iterator it=buckets[i].data.begin();
                 it!=buckets[i].data.end();
                 ++it){
                     res.insert(*it);

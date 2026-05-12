@@ -42,6 +42,23 @@ root->right = left;
 return root;
 ```
 时间复杂度度和空间复杂度均为O（N）。
+### 广搜
+原来用队列同样可以实现。我想的是通过栈就能实现自动翻转，结果越来越复杂，是我有点天马行空了。
+在子节点放入队列前后，都可以进行旋转。
+```cpp
+if(!root) return root;
+std::queue<TreeNode*> nodeQueue;
+nodeQueue.push(root);
+while(!nodeQueue.empty()){
+    TreeNode* front=nodeQueue.front();
+    std::swap(front->left, front->right);
+    if(front->left) nodeQueue.push(front->left);
+    if(front->right) nodeQueue.push(front->right);
+    nodeQueue.pop();
+} 
+return root;
+```
+时间复杂度O（N），空间复杂度O（N）。
 
 ## 总结
 对于二叉树的大部分问题都可通过深度（递归）或者广度（循环+队列）解决。

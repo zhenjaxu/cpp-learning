@@ -5,6 +5,8 @@
 2. 对象池
 3. AABB碰撞
 4. AI模块
+5. Health系统
 
 ## 整合
-1. 对象池+AABB+ECS架构
+1. 对象池+AABB+ECS架构（GameECS）
+2. 对象池+AABB+Health+AI（Demo1）

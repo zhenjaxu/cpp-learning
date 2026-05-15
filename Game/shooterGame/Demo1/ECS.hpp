@@ -33,38 +33,37 @@ class ECS{
     std::vector<EntityType> types;      // 实体标签
 
     std::queue<size_t> freeSlots;       // 回收死亡的槽位
-    size_t slotCount=0;                 // 已经push_back过的总槽位数
+    size_t slotCount=0;                 // 已经初始化过的总槽位数
     const float dt;                      // 帧间隔时间
     int reverse=1;                      // 控制敌机转向
-    const float chaseRange=50.0f;     // 敌机返现玩家距离
+    const float chaseRange=50.0f;     // 敌机发现玩家距离
+    // 实体造成的伤害
     const int bulletWound=25;
     const int enemyWound=25;
     const int playerWound=50;
+    // 游戏上下边界
+    const int upperBoundary=150;
+    const int lowerBoundary=0;
     
     // 申请内存
     size_t acquire(EntityType type, float x, float y){
         size_t id;
         if(!freeSlots.empty()){
-            id=freeSlots.front();
-            freeSlots.pop();
-            positions[id]={x, y};
-            velocities[id]={initMap[type][0], initMap[type][1]};
-            colliders[id]={x, y, initMap[type][2], initMap[type][3]};
-            alive[id]=true;
-            healths[id]={(int)initMap[type][4], (int)initMap[type][5]};
-            types[id]=type;
-        }else if(slotCount<MAX_ENTITIES){
-            id=slotCount++;
-            positions.push_back({x, y});
-            velocities.push_back({initMap[type][0], initMap[type][1]});
-            colliders.push_back({x, y, initMap[type][2], initMap[type][3]});
-            alive.push_back(true);
-            healths.push_back({(int)initMap[type][4], (int)initMap[type][5]});
-            types.push_back(type);
-        }else{
+            id=freeSlots.front();freeSlots.pop();
+        }
+        else if(slotCount<MAX_ENTITIES) id=slotCount++;   
+        else{
             std::cout<<"Pool full!\n";
             return INVALID_ID;
         }
+        // 覆盖原来是数据
+        positions[id]={x, y};
+        velocities[id]={initMap[type][0], initMap[type][1]};
+        colliders[id]={x, y, initMap[type][2], initMap[type][3]};
+        alive[id]=true;
+        healths[id]={(int)initMap[type][4], (int)initMap[type][5]};
+        types[id]=type;
+
         return id;
     }
     // 释放
@@ -112,35 +111,34 @@ class ECS{
 public:
     ECS(float dt_):dt(dt_){
         // 内存块预分配
-        positions.reserve(MAX_ENTITIES);
-        velocities.reserve(MAX_ENTITIES);
-        colliders.reserve(MAX_ENTITIES);
-        healths.reserve(MAX_ENTITIES);
-        alive.reserve(MAX_ENTITIES);
-        types.reserve(MAX_ENTITIES);
+        positions.resize(MAX_ENTITIES);
+        velocities.resize(MAX_ENTITIES);
+        colliders.resize(MAX_ENTITIES);
+        healths.resize(MAX_ENTITIES);
+        alive.resize(MAX_ENTITIES, false);
+        types.resize(MAX_ENTITIES, EntityType::NONE);
         // 固定生成玩家0（35，0）
         acquire(EntityType::PLAYER, 35.0f, 0);
     }
     // 生成敌人
-    size_t spawnEnemy(float enemyX, float enemyY){
-        return acquire(EntityType::ENEMY, enemyX, enemyY);
+    void spawnEnemy(float enemyX, float enemyY){
+        acquire(EntityType::ENEMY, enemyX, enemyY);
     }
     // 生成子弹
-    size_t spawnBullet(size_t id){
+    void spawnBullet(size_t id){
         if(alive[id]&&types[id]==EntityType::PLAYER) 
-            return acquire(EntityType::BULLET, 47.5f, 0);
-        return INVALID_ID;
+            acquire(EntityType::BULLET, 47.5f, 0);
     }
     // 更新位置
     void update(){
         for(size_t id=0;id<slotCount;++id){
             if(!alive[id]) continue;
             if(types[id]==EntityType::ENEMY){
-                if(positions[id].y<0) release(id);
+                if(positions[id].y<lowerBoundary) release(id);
                 updateAI(id, 0);
             }
             if(types[id]==EntityType::BULLET){
-                if(positions[id].y>150) release(id);
+                if(positions[id].y>upperBoundary) release(id);
             }
             positions[id].x+=velocities[id].vx*dt;
             positions[id].y+=velocities[id].vy*dt;

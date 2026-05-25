@@ -9,6 +9,7 @@
 ```cpp
 int search(std::vector<int>& nums, int target);
 ```
+### 二分查找
 尝试之后发现，由于断裂点未知导致target的位置无法锁定在某一半。而断点的检索又需要遍历**整个**数组。
 但直接检索target才只需遍历一次数组，简直多此一举。
 ```cpp

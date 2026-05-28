@@ -104,13 +104,14 @@ return num_islands;
 ```
 时间复杂度O(mn)，空间复杂度O(min(m,n))。
 ### 并查集
+通过并查集查看各板块间状态，连接后计数减一，岛屿数量等于板块数减去连接数。
 ```cpp
 class UnionFind{
 public:
     UnionFind(std::vector<std::vector<char>>& grid){
         count=0;
         int m=grid.size();
-        int n= grid[0].size();
+        int n=grid[0].size();
         for(int i=0;i<m;++i){
             for(int j=0;j<n;++j){
                 if(grid[i][j]=='1'){
@@ -137,11 +138,11 @@ public:
         int rooty=find(y);
         if(rootx!=rooty){
             if(rank[rootx]<rank[rooty]){
-                swap(rootx, rooty);
+                std::swap(rootx, rooty);
             }
             parent[rooty]=rootx;
             if(rank[rootx]==rank[rooty]) rank[rootx]+=1;
-            --count;
+            --count;        // 连接一次，减一一次
         }
     }
 
@@ -150,8 +151,8 @@ public:
     }
 
 private:
-    std::vector<int> parent;
-    std::vector<int> rank;
+    std::vector<int> parent;    // 显示快开始连接的根
+    std::vector<int> rank;      // 根为1，其他为0
     int count;
 };
 ```

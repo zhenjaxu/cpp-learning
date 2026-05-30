@@ -28,6 +28,6 @@ cd Cpp-learning
 
 # 以 Pong 为例
 cd Game\Programming\Game\Pong
-cmake -G "MinGW Makefiles" -B build
+# cmake -G "MinGW Makefiles" -B build
 cmake --build build
 .\build\game

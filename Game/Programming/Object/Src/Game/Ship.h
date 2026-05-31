@@ -1,5 +1,6 @@
 #pragma once
 #include"../Engine/Core/Actor.h"
+#include<cstdint>
 
 class Ship:public Actor{
 public: 

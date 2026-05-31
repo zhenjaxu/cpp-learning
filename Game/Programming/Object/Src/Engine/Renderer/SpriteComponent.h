@@ -10,9 +10,9 @@ public:
     virtual void Draw(SDL_Renderer* renderer);
     virtual void SetTexture(SDL_Texture* texture);
 
-    void GetDrawOrder() const {return mDrawOrder;}
-    void GetTexHeight() const {return mTexHeight;}
-    void GetTexWidth() const {return mTexWidth;}
+    int GetDrawOrder() const {return mDrawOrder;}
+    int GetTexHeight() const {return mTexHeight;}
+    int GetTexWidth() const {return mTexWidth;}
 
 protected:
     SDL_Texture* mTexture;

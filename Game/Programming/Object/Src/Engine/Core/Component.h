@@ -9,7 +9,7 @@ public:
 
     int GetUpdateOrder() const {return mUpdateOrder;}
 
-private:
+protected:
     class Actor* mOwner;
     int mUpdateOrder;
 };

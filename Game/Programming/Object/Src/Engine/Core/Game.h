@@ -41,4 +41,4 @@ private:
     bool mUpdatingActors;
 
     class Ship* mShip;
-}
+};

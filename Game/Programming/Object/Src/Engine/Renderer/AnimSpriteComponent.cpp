@@ -5,7 +5,7 @@
 AnimSpriteComponent::AnimSpriteComponent(Actor* owner, int drawOrder)
 : SpriteComponent(owner, drawOrder),
   mCurrFrame(0.0f),
-  mAnimFPS(24.0f),
+  mAnimFPS(24.0f)
 {}
 
 void AnimSpriteComponent::Update(float deltaTime){
@@ -19,7 +19,7 @@ void AnimSpriteComponent::Update(float deltaTime){
         mCurrFrame-=mAnimTextures.size();
     }
 
-    SetTexutre(mAnimTextures[static_cast<int>(mCurrFrame)]);
+    SetTexture(mAnimTextures[static_cast<int>(mCurrFrame)]);
 }
 
 void AnimSpriteComponent::SetAnimTextures(const std::vector<SDL_Texture*> textures){

@@ -1,0 +1,3 @@
+"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\TravelInSpace.dir/objects.a
+D:\mingw64\x86_64-16.1.0-release-posix-seh-ucrt-rt_v14-rev0\mingw64\bin\ar.exe qc CMakeFiles\TravelInSpace.dir/objects.a @CMakeFiles\TravelInSpace.dir\objects1.rsp
+D:\mingw64\x86_64-16.1.0-release-posix-seh-ucrt-rt_v14-rev0\mingw64\bin\c++.exe -Wl,--whole-archive CMakeFiles\TravelInSpace.dir/objects.a -Wl,--no-whole-archive -o TravelInSpace.exe -Wl,--out-implib,libTravelInSpace.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\TravelInSpace.dir\linkLibs.rsp

@@ -27,7 +27,7 @@ bool Game::Initialize(){
         return false;
     }
 
-    mRenderer=SDL_CreateRenderer(mWindow, -1, SDL_RENDERER_ACCELERATE|SDL_RENDERER_PRESENTVSYNC);
+    mRenderer=SDL_CreateRenderer(mWindow, -1, SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
     if(!mRenderer){
         SDL_Log("Failed to create renderer: %s", SDL_GetError());
         return false;
@@ -71,7 +71,7 @@ void Game::ProcessInput(){
         }
     }
 
-    const Uint8* state=SDL_GetKeyBoardState(NULL);
+    const Uint8* state=SDL_GetKeyboardState(NULL);
     if(state[SDL_SCANCODE_ESCAPE]){
         mIsRunning=false;
     }
@@ -129,8 +129,8 @@ void Game::LoadData(){
     BGSpriteComponent* bg=new BGSpriteComponent(temp);
     bg->SetScreenSize(Vector2(1024.0f, 768.0f));
     std::vector<SDL_Texture*> bgtexs={
-        GetTexture("../Assets/Farback/Farback01.png"),
-        GetTexture("../Assets/Farback/Farback02.png")
+        GetTexture("Assets/Textures/Farback/Farback01.png"),
+        GetTexture("Assets/Textures/Farback/Farback02.png")
     };
     bg->SetBGTextures(bgtexs);
     bg->SetScrollSpeed(-100.0f);
@@ -138,22 +138,22 @@ void Game::LoadData(){
     bg=new BGSpriteComponent(temp, 50);
     bg->SetScreenSize(Vector2(1024.0f, 768.0f));
     bgtexs={
-        GetTexture("../Assets/Stars.png"),
-        GetTexture("../Assets/Stars.png")
+        GetTexture("Assets/Textures/Stars.png"),
+        GetTexture("Assets/Textures/Stars.png")
     };
     bg->SetBGTextures(bgtexs);
     bg->SetScrollSpeed(-200.0f);
 }
 
 void Game::UnloadData(){
-    while(!Actors.empty()){
-        delete Actors.back();
+    while(!mActors.empty()){
+        delete mActors.back();
     }
 
     for(auto i:mTextures){
         SDL_DestroyTexture(i.second);
     }
-    mTextrues.clear();
+    mTextures.clear();
 }
 
 SDL_Texture* Game::GetTexture(const std::string& fileName){
@@ -177,7 +177,7 @@ SDL_Texture* Game::GetTexture(const std::string& fileName){
             return nullptr;
         }
 
-        mTextures.emplace_back(tex);
+        mTextures.emplace(fileName.c_str(), tex);
     }
 
     return tex;
@@ -185,7 +185,7 @@ SDL_Texture* Game::GetTexture(const std::string& fileName){
 
 void Game::AddActor(Actor* actor){
     if(mUpdatingActors){
-        mPendingActor.emplace_back(actor);
+        mPendingActors.emplace_back(actor);
     }
     else{
         mActors.emplace_back(actor);

@@ -24,7 +24,7 @@ void BGSpriteComponent::Draw(SDL_Renderer* renderer){
         SDL_Rect r;
 
         r.w=static_cast<int>(mScreenSize.x);
-        r.w=static_cast<int>(mScreenSize.y);
+        r.h=static_cast<int>(mScreenSize.y);
         r.x=static_cast<int>(mOwner->GetPosition().x-r.w/2+bg.mOffset.x);
         r.y=static_cast<int>(mOwner->GetPosition().y-r.h/2+bg.mOffset.y);
 
@@ -32,7 +32,7 @@ void BGSpriteComponent::Draw(SDL_Renderer* renderer){
     }
 }
 
-void BGSpriteComponent::SetBGTextures(const std::vector<SDL_Texture*> textures){
+void BGSpriteComponent::SetBGTextures(const std::vector<SDL_Texture*>& textures){
     int count=0;
     for(auto tex:textures){
         BGTexture temp;

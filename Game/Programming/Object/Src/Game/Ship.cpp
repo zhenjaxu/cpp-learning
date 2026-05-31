@@ -10,10 +10,10 @@ Ship::Ship(Game* game)
 {
     AnimSpriteComponent* asc=new AnimSpriteComponent(this);
     std::vector<SDL_Texture*> anim={
-        game->GetTexture("../Assets/Ship/Ship01.png"),
-        game->GetTexture("../Assets/Ship/Ship02.png"),
-        game->GetTexture("../Assets/Ship/Ship03.png"),
-        game->GetTexture("../Assets/Ship/Ship04.png")
+        game->GetTexture("Assets/Textures/Ship/Ship01.png"),
+        game->GetTexture("Assets/Textures/Ship/Ship02.png"),
+        game->GetTexture("Assets/Textures/Ship/Ship03.png"),
+        game->GetTexture("Assets/Textures/Ship/Ship04.png")
     };
     asc->SetAnimTextures(anim);
 }

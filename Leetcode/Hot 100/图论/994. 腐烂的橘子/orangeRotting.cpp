@@ -27,8 +27,7 @@ int orangesRotting(std::vector<std::vector<int>>& grid){
             if(x>0&&grid[x-1][y]==1){
                 grid[x-1][y]=2;
                 rottings.push({x-1, y});
-            }
-            if(x<m-1&&grid[x+1][y]==1){
+            }if(x<m-1&&grid[x+1][y]==1){
                 grid[x+1][y]=2;
                 rottings.push({x+1, y});
             }if(y>0&&grid[x][y-1]==1){

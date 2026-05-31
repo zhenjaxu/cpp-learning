@@ -193,7 +193,7 @@ void Game::AddActor(Actor* actor){
 }
 
 void Game::RemoveActor(Actor* actor){
-    auto iter=std::find(mPendingActor.begin(), mPendingActors.end(), actor);
+    auto iter=std::find(mPendingActors.begin(), mPendingActors.end(), actor);
     if(iter!=mPendingActors.end()){
         std::iter_swap(iter, mPendingActors.end()-1);
         mPendingActors.pop_back();

@@ -31,3 +31,15 @@ void BGSpriteComponent::Draw(SDL_Renderer* renderer){
         SDL_RenderCopy(renderer, bg.mTexture, nullptr, &r);
     }
 }
+
+void BGSpriteComponent::SetBGTextures(const std::vector<SDL_Texture*> textures){
+    int count=0;
+    for(auto tex:textures){
+        BGTexture temp;
+        temp.mTexture=tex;
+        temp.mOffset.x=count*mScreenSize.x;
+        temp.mOffset.y=0;
+        mBGTextures.emplace_back(temp);
+        count++;
+    }
+}

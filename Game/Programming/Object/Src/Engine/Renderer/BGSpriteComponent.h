@@ -18,10 +18,10 @@ public:
 
 private:
     struct BGTexture{
-        SDL_Texture* texture;
+        SDL_Texture* mTexture;
         Vector2 mOffset;
     };
-    std::vector<BGTexture> BGTextures;
+    std::vector<BGTexture> mBGTextures;
     Vector2 mScreenSize;
     float mScrollSpeed;
 };

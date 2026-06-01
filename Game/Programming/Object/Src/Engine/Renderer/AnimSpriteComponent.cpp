@@ -2,10 +2,11 @@
 
 #include"../Utils/Math.h"
 
-AnimSpriteComponent::AnimSpriteComponent(Actor* owner, int drawOrder)
+AnimSpriteComponent::AnimSpriteComponent(Actor* owner, int drawOrder, bool loop)
 : SpriteComponent(owner, drawOrder),
   mCurrFrame(0.0f),
-  mAnimFPS(24.0f)
+  mAnimFPS(24.0f),
+  mLoop(loop)
 {}
 
 void AnimSpriteComponent::Update(float deltaTime){
@@ -16,7 +17,8 @@ void AnimSpriteComponent::Update(float deltaTime){
     }
 
     while(mCurrFrame>=mAnimTextures.size()){
-        mCurrFrame-=mAnimTextures.size();
+        if(mLoop) mCurrFrame-=mAnimTextures.size();
+        else mCurrFrame=mAnimTextures.size()-1;         // 播放完后停止
     }
 
     SetTexture(mAnimTextures[static_cast<int>(mCurrFrame)]);

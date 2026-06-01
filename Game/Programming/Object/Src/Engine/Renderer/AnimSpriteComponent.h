@@ -4,7 +4,7 @@
 
 class AnimSpriteComponent:public SpriteComponent{
 public:
-    AnimSpriteComponent(class Actor* owner, int drawOrder=100);
+    AnimSpriteComponent(class Actor* owner, int drawOrder=100, bool loop=true);
     
     void Update(float deltaTime);
     
@@ -17,4 +17,6 @@ private:
     std::vector<SDL_Texture*> mAnimTextures;
     float mCurrFrame;
     float mAnimFPS;
+    
+    bool mLoop;     // 是否循环播放动画
 };

@@ -1,5 +1,11 @@
 # 游戏对象与2D图形
-
+## 简介
+游戏对象，是指在游戏世界中进行更新的、绘制的任何事物。
+## 游戏对象
+### 类型
+游戏对象有更新并绘制的（如玩家和敌人）、绘制但不更新的（静态对象）、更新但不绘制的（触发器和相机）。
+### 模型
+首先是传统OOP，通过单一整体式类层次和继承来实现。
 ```cpp
 class Actor{
 public:
@@ -16,7 +22,7 @@ public:
     void Draw() override;
 };
 ```
-
+其次是组件模式，通过多个组件组合在一个类中实现游戏对象，其类层次结构则浅的多。
 ```cpp
 class GameObject{
 public:
@@ -26,7 +32,7 @@ private:
     std::unordered_set<Component*> components_;
 };
 ```
-
+然后是两种方式相结合，并通过依赖注入（如构造函数中的Game指针）的方式避免单例模式的出现。这种方式在Unreal Engine 4中有用到。
 ```cpp
 class Actor{
 public:
@@ -65,7 +71,7 @@ private:
     class Game* game;
 };
 ```
-
+组件类中的构造，传入Actor指针。在构造Actor创建组件的时候，传入this指针。而组件构造的时候调用AddComponent，实现组件自动添加。析构的时候则调用RemoveComponent，实现组件自动移除。
 ```cpp
 class Component{
 public:
@@ -85,7 +91,7 @@ protected:
     int updateOrder_;
 };
 ```
-
+游戏可能正在遍历并更新当前帧的全部对象，而更新过程中可能加入的新对象（如掉落物）。但此时不应该对新对象进行更新，而是加入待处理，等待更新完成之后加入更新队列中。
 ```cpp
 void Game::AddActor(Actor* actor){
     // If updating actors, neet to add to pending
@@ -97,7 +103,7 @@ void Game::AddActor(Actor* actor){
     }
 }
 ```
-
+那么游戏更新主要分三个步骤：更新当前所有对象，加入新对象和移除死亡对象。
 ```cpp
 void Game::UpdateGame(){
     // Compute delta time (as in Chapter 1)
@@ -130,17 +136,22 @@ void Game::UpdateGame(){
     }
 }
 ```
-
+游戏结束时，在Shutdown中调用Unload将所有资源释放。
 ```cpp
 // Because ~Actor calls RemoveActor, use a different style loop
 while(!mActors.empty()){
     delete mActors.back();
 }
 ```
-
+## 图形加载
+### 技术栈
+下载SDL2_image，将lib、include合并到SDL2中，再将dll文件复制到当前文件夹中。
+### 加载文件
+头文件中包含SDL2_image.h，并在game的初始化中调用IMG_Init，返回非零表示成功（与SDL_Init不同）。
 ```cpp
 IMG_Init(IMG_INIT_PNG);
 ```
+其次是从文件中加载图片，先由IMG_Load返回SDL_Surface的指针，并用SDL_CreateTextureFromSurface返回SDL_Texture的指针。而texture就可以用于图片的管理和绘制了。
 ```cpp
 // Loads an image from a file
 // Returns a pointer to a SDL_Surface if successful, otherwise nullptr
@@ -173,7 +184,8 @@ SDL_Texture* LoadTexture(const char* fileName){
     return texture;
 }
 ```
-
+### 图形组件
+图形组件专门用于图形的管理和绘制。其Draw会在game的GenerateOutput中被调用。而SetTexture会在游戏的每次更新时被调用，设置当前应该绘制的图像。
 ```cpp
 class SpriteComponent:public Component{
 public:
@@ -197,7 +209,7 @@ protected:
     int mTextureWidth;
 };
 ```
-
+每一帧进行游戏绘制时，会按照绘制顺序遍历所有图形组件并绘制。所以添加图形组件的时候需按顺序插入。
 ```cpp
 void Game::AddSprite(SpriteComponent* sprite){
     // Find the insertion point in the sorted vector
@@ -213,7 +225,7 @@ void Game::AddSprite(SpriteComponent* sprite){
     mSprites.insert(iter, sprite);
 }
 ```
-
+在设置图片（游戏更新阶段）时，SDL_QueryTexture会获取图片的尺寸，而尺寸会在游戏绘制阶段用到。
 ```cpp
 void SpriteComponent::SetTexture(SDL_Texture* texture){
     mTexture=texture;
@@ -221,7 +233,7 @@ void SpriteComponent::SetTexture(SDL_Texture* texture){
     SDL_QueryTexture(texture, nullptr, nullptr, &mTextureWidth, &mTextureHeight);
 }
 ```
-
+通过SDL_RenderCopy或SDL_RenderCopyEx（具备旋转和翻转功能）对图形进行绘制。
 ```cpp
 // Renders a texture to the rendering target
 // Returns 0 on success, negative value on failure
@@ -243,7 +255,7 @@ int SDL_RenderCopyEx(
     SDL_RenderFlip flip             // How to flip texture (usually SDL_FLIP_NONE)
 );
 ```
-
+绘制过程：创建SDL_Rect作为载体，计算尺寸和位置，然后通过SDL_RenderCopy或SDL_RenderCopyEx进行绘制。
 ```cpp
 void SpriteComponent::Draw(SDL_Renderer* renderer){
     if(mTexture){
@@ -268,7 +280,7 @@ void SpriteComponent::Draw(SDL_Renderer* renderer){
     }
 }
 ```
-
+动画组件则继承图形组件，新增Update用于对动画进行更新，根据mCurrFrame计算当前展示的图片并调用SetTexture设置。还可设置动画图片和动画帧数。
 ```cpp
 class AnimSpriteComponent:public SpriteComponent{
 public:
@@ -278,7 +290,7 @@ public:
     // Set the textures used for animation
     void SetAnimTextures(const std::vector<SDL_Texture*>& textures);
     // Set/get the animation FPS
-    float GetAnimFPS() const {return mAnimFPSl;}
+    float GetAnimFPS() const {return mAnimFPS;}
     void SetAnimFPS(float fps){mAnimFPS=fps;}
 
 private:
@@ -290,7 +302,6 @@ private:
     float mAnimFPS;
 };
 ```
-
 ```cpp
 void AnimSpriteComponent::Update(float deltaTime){
     SpriteComponent::Update(deltaTime);
@@ -310,7 +321,7 @@ void AnimSpriteComponent::Update(float deltaTime){
     }
 }
 ```
-
+背景组件同样需要绘制，继承图形组件。与动画不同，背景图并非整个改变，而是根据角色移动而偏移。一般设置两或多个图片保证背景衔接，不会出现空白。
 ```cpp
 class BGSpriteComponent:public SpriteComponent{
 public:
@@ -337,7 +348,6 @@ private:
     float mScrollSpeed;
 };
 ```
-
 ```cpp
 void BGSpriteComponent::SetBGTextures(const std::vector<SDL_Texture*>& textures){
     int count=0;
@@ -352,7 +362,22 @@ void BGSpriteComponent::SetBGTextures(const std::vector<SDL_Texture*>& textures)
     }
 }
 ```
+```cpp
+void BGSpriteComponent::Update(float deltaTime){
+    SpriteComponent::Update(deltaTime);
 
+    for(auto& bg:mBGTextures){
+        bg.mOffset.x+=mScrollSpeed*deltaTime;
+
+        if(bg.mOffset.x<-mScreenSize.x){
+            // 播放完的图片重新衔接到整个数组的后面
+            bg.mOffset.x=mBGTextures.size()*mScreenSize.x+bg.mOffset.x;
+        }
+    }
+}
+```
+## 游戏逻辑
+实现操控飞船遨游太空。飞船有移动速度，由ProcessKeyboard控制。飞船有动画组件，播放飞行动画。
 ```cpp
 class Ship:public Actor{
 public:
@@ -367,7 +392,7 @@ private:
     float mDownSpeed;
 };
 ```
-
+动画组件构造时传入this指针，会自动添加到游戏对象的组件中。而Actor构造中传入的game则调用SetTexture从文件中获取图片。最后将动画数组放入动画组件中。
 ```cpp
 AnimSpriteComponent* asc=new AnimSpriteComponent(this);
 std::vector<SDL_Texture*> anims={
@@ -378,7 +403,7 @@ std::vector<SDL_Texture*> anims={
 };
 asc->SetAnimTextures(anims);
 ```
-
+Ship实现自己的对象更新，实现边界判定和更新当前位置。
 ```cpp
 void Ship::UpdateActor(float deltaTime){
     Actor::UpdateActor(deltaTime);
@@ -391,3 +416,11 @@ void Ship::UpdateActor(float deltaTime){
     SetPostion(pos);
 }
 ```
+## 编译和运行
+```shell
+cmake -G "MinGW Makefiles" -B build
+cmake --build build
+./build/TravelInSpace
+```
+游戏运行正常，飞船控制正常，边界正常，背景循环不断，退出正常。
+![1780414685790](image/README/1780414685790.png)

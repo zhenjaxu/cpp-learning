@@ -41,3 +41,47 @@ while(!que.empty()){
 // 队列为空后，表示当前组合值全部超过总金额，且没有找到结果
 return -1;      
 ```
+时间复杂度O(Sn)，空间复杂度O(S)。
+
+## 题解
+### 递归
+从上到下，以amount出发，递归amount-coin，向下搜索，最终返回最少数量。
+```cpp
+std::vector<int> count;
+int dp(std::vector<int>& coins, int rem){
+    if(rem<0) return -1;
+    if(rem==0) return 0;
+    if(count[rem-1]!=0) return count[rem-1];
+    int Min=INT_MAX;
+    for(int coin:coins){
+        int res=dp(coins, rem-coin);
+        if(res>=0&&res<Min){
+            Min=res+1;
+        }
+    }
+    count[rem-1]=Min==INT_MAX?-1:Min;
+    return count[rem-1];
+}
+```
+```cpp
+if(amount<1) return 0;
+count.resize(amount);
+return dp(coins, amount);
+```
+时间复杂度O(Sn)，空间复杂的O(S)。
+### 动态规划
+从下至上，计算当前的结果由之前计算的得出。
+```cpp
+int Max=amount+1;
+std::vector<int> dp(amount+1, Max);
+dp[0]=0;
+for(int i=1;i<=amount;++i){
+    for(int j=0;j<(int)coins.size();++j){
+        if(coins[j]<=i){
+            dp[i]=std::min(dp[i], dp[i-coins[j]]+1);
+        }
+    }
+}
+return dp[amount]>amount?-1:dp[amount];
+```
+时间复杂度O(Sn)，空间复杂度O(S)。

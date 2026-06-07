@@ -189,3 +189,68 @@ void InputComponent::ProcessInput(const uint8_t* keyState){
     SetAngularSpeed(angularSpeed);
 }
 ```
+
+```cpp
+acceleration=sumOfForces/mass;
+veclocity+=acceleration*deltaTime;
+position+=veclocity*deltaTime;
+```
+
+```cpp
+class CircleComponent:public Component{
+public:
+    CircleComponent(class Actor* owner);
+
+    void SetRadius(float radius){mRadius=radius;}
+    float GetRadius() const;
+
+    const Vector2& GetCenter() const;
+
+private:
+    float mRadius;
+};
+```
+```cpp
+bool Intersect(const CircleComponent& a, const CircleComponent& b){
+    Vector2 diff=a.GetCenter()-b.GetCenter();
+    float distSq=diff.LengthSq();
+
+    float radiiSq=a.GetRadius()+b.GetRadius();
+    radiiSq*=radiiSq;
+
+    return distSq<=radiiSq;
+}
+```
+
+```cpp
+mCircle=new CircleComponent(this);
+mCircle->SetRadius(40.0f);
+```
+```cpp
+void Laser::UpdateActor(float deltaTime){
+    for(auto ast:GetGame()->GetCircle()){
+        if(Intersect(*mCircle, *(ast->GetCircle()))){
+            SetState(EDead);
+            ast->SetState(EDead);
+            break;
+        }
+    }
+}
+```
+
+```cpp
+void Ship::ActorInput(const uint8_t* keyState){
+    if(keyState[SDL_SCANCODE_SPACE]&&mLaserCooldown<=0.0f){
+        Laser* laser=new Laser(GetGame());
+        laser->SetPosition(GetPosition());
+        laser->SetRotation(GetRotation());
+
+        mLaserCooldown=0.5f;
+    }
+}
+```
+```cpp
+void Ship::UpdateActor(float deltaTime){
+    mLaserCooldown-=deltaTime;
+}
+```

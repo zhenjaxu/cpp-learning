@@ -47,3 +47,81 @@ public:
 };
 ```
 时间复杂度O(n*(m+n))，空间复杂度O(2n)。
+
+## 题解
+### 深搜
+题解使用edges存放后续可学习的课程，这种拓扑的思维直接避免了每次去遍历prerequisites找对应的课程。通过visited设置课程的三种状态，同时进行环的检查和已学过课程的标记，降低时间复杂度和空间复杂度。
+```cpp
+std::vector<std::vector<int>> edges;
+std::vector<int> visited;
+bool valid=true;
+
+void dfs(int u){
+    visited[u]=1;
+    for(int v:edges[u]){
+        if(visited[v]==0){
+            dfs(v);
+            if(!valid){
+                return;
+            }
+        }else if(visited[v]==1){
+            valid=false;
+            return;
+        }
+    }
+    visited[u]=2;
+}
+```
+```cpp
+edges.resize(numCourses);
+visited.resize(numCourses);
+for(const auto& info:prerequisites){
+    edges[info[1]].push_back(info[0]);
+}
+
+for(int i=0;i<numCourses&&valid;++i){
+    if(!visited[i]){
+        dfs(i);
+    }
+}
+return valid;
+```
+时间复杂度O(n+m)，空间复杂度O(n+m)。
+### 广搜
+使用同样的方法使用edges存放后续课程。广搜通过入度判断当前课程是否可以学习，入度会随着前置课程的学习而减少。如后续课程可学，放入队列中进入下一次学习。最后需要一个计数器visited在学习的过程中记录学习课程的数目，避免再次遍历。
+```cpp
+std::vector<std::vector<int>> edges;
+std::vector<int> indeg;
+```
+```cpp
+edges.resize(numCourses);
+indeg.resize(numCourses);
+
+for(const auto& info:prerequisites){
+    edges[info[1]].push_back(info[0]);
+    ++indeg[info[0]];
+}
+
+std::queue<int> q;
+for(int i=0;i<numCourses;++i){
+    if(indeg[i]==0){
+        q.push(i);
+    }
+}
+
+int visited=0;
+while(!q.empty()){
+    ++visited;
+    int u=q.front();q.pop();
+
+    for(int v:edges[u]){
+        --indeg[v];
+        if(indeg[v]==0){
+            q.push(v);
+        }
+    }
+}
+
+return visited==numCourses;
+```
+时间复杂度O(n+m)，空间复杂度O(m+n)。

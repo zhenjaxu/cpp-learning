@@ -1,5 +1,5 @@
 #pragma once
-#include"SpriteComponent.hpp"
+#include"SpriteComponent.h"
 #include<vector>
 
 class AnimSpriteComponent:public SpriteComponent{

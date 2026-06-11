@@ -1,5 +1,5 @@
 #pragma once
-#include"../Engine/Core/Actor.hpp"
+#include"../Engine/Core/Actor.h"
 
 class Laser:public Actor{
 public:

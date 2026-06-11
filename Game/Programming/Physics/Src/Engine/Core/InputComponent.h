@@ -1,5 +1,5 @@
 #pragma once
-#include"MoveComponent.hpp"
+#include"MoveComponent.h"
 #include<cstdint>
 
 class InputComponent:public MoveComponent{
@@ -8,28 +8,28 @@ public:
 
     void ProcessInput(const uint8_t* keyState) override;
 
-    float GetMaxForward() const {return mMaxForward;}
-    float GetMaxAngular() const {return mMaxAngular;}
+    float GetMaxForwardSpeed() const {return mMaxForwardSpeed;}
+    float GetMaxAngularSpeed() const {return mMaxAngularSpeed;}
     
-    void SetMaxForward(float speed){mMaxForward=speed;}
-    void SetMaxAngular(float speed){mMaxAngular=speed;}
+    void SetMaxForwardSpeed(float speed){mMaxForwardSpeed=speed;}
+    void SetMaxAngularSpeed(float speed){mMaxAngularSpeed=speed;}
 
     int GetForwardKey() const {return mForwardKey;}
-    int GetAngularKey() const {return mAngularKey;}
+    int GetBackKey() const {return mBackKey;}
     int GetClockwiseKey() const {return mClockwiseKey;}
     int GetCounterClockwiseKey() const {return mCounterClockwiseKey;}
 
     void SetForwardKey(int key){mForwardKey=key;}
-    void SetAngularKey(int key){mAngularKey=key;}
+    void SetBackKey(int key){mBackKey=key;}
     void SetClockwiseKey(int key){mClockwiseKey=key;}
     void SetCounterClockwiseKey(int key){mCounterClockwiseKey=key;}
 
 private:
-    float mMaxForward;
-    float mMaxAngular;
+    float mMaxForwardSpeed;
+    float mMaxAngularSpeed;
     
     int mForwardKey;
-    int mAngularKey;
+    int mBackKey;
     int mClockwiseKey;
     int mCounterClockwiseKey;
 };

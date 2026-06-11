@@ -1,5 +1,5 @@
 #pragma once
-#include"Component.hpp"
+#include"Component.h"
 #include"../Utils/Math.h"
 
 class CircleComponent:public Component{
@@ -9,7 +9,7 @@ public:
     void SetRadius(float radius){mRadius=radius;}
     float GetRadius() const;
 
-    const Vector2 GetCenter() const;
+    const Vector2& GetCenter() const;
 
 private:
     float mRadius;

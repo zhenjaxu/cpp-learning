@@ -11,16 +11,16 @@ public:
     void RunLoop();
     void Shutdown();
 
-    AddActor(class Actor* actor);
-    RemoveActor(class Actor* actor);
+    void AddActor(class Actor* actor);
+    void RemoveActor(class Actor* actor);
 
-    AddSprite(class SpriteComponent* sprite);
-    RemoveSprite(class SpriteComponent* sprite);
+    void AddSprite(class SpriteComponent* sprite);
+    void RemoveSprite(class SpriteComponent* sprite);
 
     SDL_Texture* GetTexture(const std::string& fileName);
 
-    AddAsteroid(class Asteroid* ast);
-    RemoveAsteroid(class Asteroid* ast);
+    void AddAsteroid(class Asteroid* ast);
+    void RemoveAsteroid(class Asteroid* ast);
 
     std::vector<class Asteroid*> GetAsteroid(){return mAsteroids;}
 
@@ -35,7 +35,7 @@ private:
     std::unordered_map<std::string, SDL_Texture*> mTextures;
 
     std::vector<class Actor*> mActors;
-    std::vector<class Actor*> mPendings;
+    std::vector<class Actor*> mPendingActors;
 
     std::vector<class SpriteComponent*> mSprites;
     

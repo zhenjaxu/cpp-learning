@@ -14,8 +14,8 @@ public:
     void SetAnimFPS(float fps){mAnimFPS=fps;}
     
 private:
-    std::vector<SDL_Texture*> mTextures;
+    std::vector<SDL_Texture*> mAnimTextures;
 
     float mCurrFrame;
-    float AnimFPS;
+    float mAnimFPS;
 };

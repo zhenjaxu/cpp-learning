@@ -22,7 +22,7 @@ private:
         Vector2 mOffset;
     };
 
-    std::vector<SDL_Texture*> mBGTextures;
+    std::vector<BGTexture> mBGTextures;
     Vector2 mScreenSize;
     float mScrollSpeed;
 };

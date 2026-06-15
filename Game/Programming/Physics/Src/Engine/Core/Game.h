@@ -22,7 +22,7 @@ public:
     void AddAsteroid(class Asteroid* ast);
     void RemoveAsteroid(class Asteroid* ast);
 
-    std::vector<class Asteroid*> GetAsteroid(){return mAsteroids;}
+    std::vector<class Asteroid*> GetAsteroids(){return mAsteroids;}
 
 private:
     void ProcessInput();

@@ -31,3 +31,22 @@ while(right<s.size()){
 return result;
 ```
 时间复杂度O(N)，空间复杂度O(N)。
+## 题解
+题解遍历每一个字符一次，以i为左边界，以rk为右边界。
+```cpp
+std::unordered_set<char> occ;
+int n=s.size();
+int rk=-1, ans=0;
+for(int i=0;i<n;++i){
+    if(i!=0){
+        occ.erase(s[i-1]);
+    }
+    while(rk+1<n&&!occ.count(s[rk+1])){
+        occ.insert(s[rk+1]);
+        ++rk;
+    }
+    ans=std::max(ans, rk-i+1);
+}
+return ans;
+```
+时间复杂度O(N)，空间复杂度O(N)。

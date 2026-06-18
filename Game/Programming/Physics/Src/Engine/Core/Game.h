@@ -7,7 +7,7 @@
 class Game{
 public:
     Game();
-    void Initialize();
+    bool Initialize();
     void RunLoop();
     void Shutdown();
 

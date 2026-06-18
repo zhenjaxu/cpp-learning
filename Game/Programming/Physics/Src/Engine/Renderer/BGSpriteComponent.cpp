@@ -13,7 +13,7 @@ void BGSpriteComponent::Update(float deltaTime){
         bg.mOffset.x+=mScrollSpeed*deltaTime;
         
         if(bg.mOffset.x<-mScreenSize.x){
-            bg.mOffset.x+=mBGTextures.size()*mScreenSize;
+            bg.mOffset.x+=mBGTextures.size()*mScreenSize.x;
         }
     }
 }
@@ -23,14 +23,14 @@ void BGSpriteComponent::Draw(SDL_Renderer* renderer){
         SDL_Rect r;
         r.w=static_cast<int>(mScreenSize.x);
         r.h=static_cast<int>(mScreenSize.y);
-        r.x=static_cast<int>(mOwner->GetPosition().x-r.w/2);
-        r.y=static_cast<int>(mOwner->GetPosition().y-r.h/2);
+        r.x=static_cast<int>(mOwner->GetPosition().x-r.w/2+bg.mOffset.x);
+        r.y=static_cast<int>(mOwner->GetPosition().y-r.h/2+bg.mOffset.y);
 
         SDL_RenderCopy(renderer, bg.mTexture, nullptr, &r);
     }
 }
 
-void BGSpriteComponent::SetBGTextures(std::vector<SDL_Texture*>& textures){
+void BGSpriteComponent::SetBGTextures(const std::vector<SDL_Texture*>& textures){
     int count=0;
     for(auto tex:textures){
         BGTexture temp;

@@ -1,4 +1,4 @@
-#include"Random.hpp"
+#include"Random.h"
 
 void Random::Init(){
     std::random_device rd;
@@ -19,7 +19,7 @@ float Random::GetFloatRange(float min, float max){
 }
 
 int Random::GetIntRange(int min, int max){
-    std::uniform_real_distribution<int> dist(min, max);
+    std::uniform_int_distribution<int> dist(min, max);
     return dist(sGenerator);
 }
 

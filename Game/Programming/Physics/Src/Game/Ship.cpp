@@ -1,7 +1,10 @@
 #include"Ship.h"
 #include"../Engine/Core/Game.h"
 #include"../Engine/Core/InputComponent.h"
+#include"../Engine/Core/CircleComponent.h"
 #include"../Engine/Renderer/AnimSpriteComponent.h"
+#include"Laser.h"
+#include"Asteroid.h"
 
 Ship::Ship(Game* game)
 :Actor(game)
@@ -14,7 +17,7 @@ Ship::Ship(Game* game)
         game->GetTexture("Assets/Textures/Ship/Ship03.png"),
         game->GetTexture("Assets/Textures/Ship/Ship04.png")
     };
-    asc.SetAnimTextures(anims);
+    asc->SetAnimTextures(anims);
 
     auto ic=new InputComponent(this);
     ic->SetForwardKey(SDL_SCANCODE_W);
@@ -23,10 +26,20 @@ Ship::Ship(Game* game)
     ic->SetCounterClockwiseKey(SDL_SCANCODE_D);
     ic->SetMaxForwardSpeed(300.0f);
     ic->SetMaxAngularSpeed(Math::TwoPi);
+
+    mCircle=new CircleComponent(this);
+    mCircle->SetRadius(30.0f);
 }
 
 void Ship::UpdateActor(float deltaTime){
     mLaserCooldown-=deltaTime;
+
+    for(auto ast:GetGame()->GetAsteroids()){
+        if(Intersect(*mCircle, *(ast->GetCircle()))){
+            ast->SetState(EDead);
+            break;
+        }
+    }
 }
 
 void Ship::ActorInput(const uint8_t* keyState){

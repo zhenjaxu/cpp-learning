@@ -1,6 +1,7 @@
 #include"Actor.h"
 #include"Game.h"
 #include"Component.h"
+#include<algorithm>
 
 
 Actor::Actor(Game* game)
@@ -56,7 +57,7 @@ void Actor::AddComponent(Component* component){
     int myOrder=component->GetUpdateOrder();
     auto iter=mComponents.begin();
     for(;iter!=mComponents.end();++iter){
-        if(myOrder<*(iter)->GetUpdateOrder()){
+        if(myOrder<(*iter)->GetUpdateOrder()){
             break;
         }
     }
@@ -66,7 +67,7 @@ void Actor::AddComponent(Component* component){
 void Actor::RemoveComponent(Component* component){
     auto iter=std::find(mComponents.begin(), mComponents.end(), component);
     if(iter!=mComponents.end()){
-        mComonents.erase(iter);
+        mComponents.erase(iter);
     }
 }
 

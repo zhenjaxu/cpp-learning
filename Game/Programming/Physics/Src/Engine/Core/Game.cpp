@@ -5,9 +5,10 @@
 
 #include"Actor.h"
 #include"../Renderer/SpriteComponent.h"
-#include"../Renderer/BGSpriteCompnnent.h"
+#include"../Renderer/BGSpriteComponent.h"
 #include"../../Game/Ship.h"
 #include"../../Game/Asteroid.h"
+#include"../Utils/Random.h"
 
 
 Game::Game()
@@ -17,7 +18,7 @@ Game::Game()
 ,mUpdatingActors(false)
 {}
 
-Game::Initialize(){
+bool Game::Initialize(){
     if(SDL_Init(SDL_INIT_VIDEO||SDL_INIT_AUDIO)){
         SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
         return false;
@@ -56,7 +57,7 @@ void Game::RunLoop(){
 }
 
 void Game::Shutdown(){
-    UnloadDate();
+    UnloadData();
     IMG_Quit();
 
     SDL_DestroyRenderer(mRenderer);
@@ -143,7 +144,7 @@ void Game::LoadData(){
     bg->SetScreenSize(Vector2(1024.0f, 768.0f));
     std::vector<SDL_Texture*> bgtexs{
         GetTexture("Assets/Textures/Farback/Farback01.png"),
-        GetTexture("Assets/Textures/Farback/Farback01.png")
+        GetTexture("Assets/Textures/Farback/Farback02.png")
     };
     bg->SetBGTextures(bgtexs);
     bg->SetScrollSpeed(-50.0f);
@@ -169,15 +170,15 @@ void Game::UnloadData(){
     mTextures.clear();
 }
 
-void Game::GetTexture(const std::string& fileName){
+SDL_Texture* Game::GetTexture(const std::string& fileName){
     SDL_Texture* tex=nullptr;
 
     auto iter=mTextures.find(fileName);
     if(iter!=mTextures.end()){
-        tex=iter.second;
+        tex=iter->second;
     }else{
         SDL_Surface* surf=IMG_Load(fileName.c_str());
-        if(!surface){
+        if(!surf){
             SDL_Log("Failed to load surface: %s", fileName.c_str());
             return nullptr;
         }
@@ -219,7 +220,7 @@ void Game::RemoveActor(Actor* actor){
 void Game::AddSprite(SpriteComponent* sprite){
     int myDrawOrder=sprite->GetDrawOrder();
     auto iter=mSprites.begin();
-    for(;iter!=mSptires.end();++iter){
+    for(;iter!=mSprites.end();++iter){
         if(myDrawOrder<(*iter)->GetDrawOrder()){
             break;
         }
@@ -239,7 +240,7 @@ void Game::AddAsteroid(Asteroid* ast){
 }
 
 void Game::RemoveAsteroid(Asteroid* ast){
-    auto iter=std::find(mAsteroids.begin(), mAsteroids.end(), sprite);
+    auto iter=std::find(mAsteroids.begin(), mAsteroids.end(), ast);
     if(iter!=mAsteroids.end()){
         mAsteroids.erase(iter);
     }

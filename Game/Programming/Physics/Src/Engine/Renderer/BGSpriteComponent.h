@@ -10,11 +10,11 @@ public:
     void Update(float deltaTime) override;
     void Draw(SDL_Renderer* renderer) override;
 
-    void SetBGTextures(const std::vector<SDL_Texture*>& textures;)
+    void SetBGTextures(const std::vector<SDL_Texture*>& textures);
 
     void SetScreenSize(const Vector2& size){mScreenSize=size;}
-    void SetScollSpeed(float speed){mScrollSpeed=speed;}
-    float GetScollSpeed() const {return mScrollSpeed;}
+    void SetScrollSpeed(float speed){mScrollSpeed=speed;}
+    float GetScrollSpeed() const {return mScrollSpeed;}
 
 private:
     struct BGTexture{

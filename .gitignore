@@ -1,8 +1,9 @@
-# 忽略编译产物
+build/
+**/build/
+*.exe
+*.dll
 *.o
 *.obj
-
-# 忽略 CMake 生成文件
 CMakeCache.txt
 cmake_install.cmake
 Makefile

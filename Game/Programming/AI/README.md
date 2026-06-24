@@ -110,3 +110,65 @@ aic->RegisterState(new AIDeath(aic));
 aic->RegisterState(new AIAttack(aic));
 aic->ChangeState("Patrol");
 ```
+## 寻路
+### 图形
+```cpp
+struct GraphNode{
+    std::vector<GraphNode*> mAdjacent;
+};
+
+struct Graph{
+    std::vector<GraphNode*> mNodes;
+};
+```
+
+```cpp
+struct WeightedEdge{
+    struct WeightGraphNode* mFrom;
+    struct WeightGraphNode* mTo;
+    float mWeight;
+};
+
+struct WeightedGraphNode{
+    std::vector<WeightEdge*> mEdges;
+};
+```
+### 广度优先搜索
+```cpp
+using NodeToParentMap=
+    std::unordered_map<const GraphNode*, const GraphNode*>;
+```
+```cpp
+bool BFS(const Graph& graph, const GraphNode* start,
+         const GraphNode* goal, NodeToParentMap& outMap)
+{
+    bool pathFound=false;
+    std::queue<const GraphNode*> q;
+    q.emplace(start);
+
+    while(!q.empty()){
+        const GraphNode* current=q.front();
+        q.pop();
+        if(current=goal){
+            pathFound=true;
+            break;
+        }
+
+        for(const GraphNode* node:current->mAdjacent){
+            const GraphNode* parent=outMap[node];
+            if(parent==nullptr&&node!=start){
+                outMap[node]=current;
+                q.emplace(node);
+            }
+        }
+
+        return pathFound;
+    }
+}
+```
+
+```cpp
+NodeToParentMap map;
+bool found=BFS(g, g.mNodes[0], g.mNodes[9], map);
+```
+### heuristics函数

@@ -3,9 +3,6 @@
 #include<SDL2/SDL.h>
 #include<vector>
 
-struct Vector2{int x, y;};
-extern const SDL_Color COLORS[8];
-
 class Board:public Actor{
 public:
     Board(class Game* game);
@@ -25,9 +22,12 @@ public:
     int GetRowsSize() const {return mRowsSize;}
     float GetCellSize() const {return mCellSize;}
 
+    SDL_Color* GetColors() const {return mColors;}
 private:
     std::vector<std::vector<int>> mGrid;
     int mColumnsSize;
     int mRowsSize;
     float mCellSize;
+
+    const SDL_Color mColors[8];
 };

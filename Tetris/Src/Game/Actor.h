@@ -2,6 +2,8 @@
 #include<cstdint>
 #include<SDL2/SDL.h>
 
+struct Vector2{int x, y;};
+
 class Actor{
 public:
     Actor(class Game* game);

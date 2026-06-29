@@ -98,12 +98,8 @@ void Game::LoadData(){
     mBoard->SetCellSize(mBoardCell);
 
     mPiece=new Piece(this);
-    mPiece->SetSpeed(0.05f);
-    mPiece->SetDropSpeed(0.5f);
-    mPiece->SetLeftKey(SDL_SCANCODE_A);
-    mPiece->SetRightKey(SDL_SCANCODE_D);
-    mPiece->SetRotateKey(SDL_SCANCODE_W);
-    mPiece->SetDropKey(SDL_SCANCODE_S);
+    mPiece->SetSpeed(0.5f);
+    mPiece->SetDropSpeed(0.05f);
 }
 
 void Game::UnloadData(){

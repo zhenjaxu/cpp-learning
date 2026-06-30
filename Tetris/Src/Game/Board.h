@@ -7,6 +7,7 @@ class Board:public Actor{
 public:
     Board(class Game* game);
 
+    void Init(int columns, int rows, int cell);
     void Draw(SDL_Renderer* renderer) override;
 
     bool IsValid(const Vector2 blocks[4]) const;
@@ -15,19 +16,17 @@ public:
     void Draw(SDL_Renderer* renderer) const;
     void Reset();
 
-    void SetColumnsSize(int size){mColumnsSize=size;}
-    void SetRowsSize(int size){mRowsSize=size;}
-    void SetCellSize(float size){mCellSize=size;}
-    int GetColumnsSize() const {return mColumnsSize;}
-    int GetRowsSize() const {return mRowsSize;}
-    float GetCellSize() const {return mCellSize;}
+    int GetColumns() const {return mColumns;}
+    int GetRows() const {return mRows;}
+    int GetCell() const {return mCell;}
 
-    SDL_Color* GetColors() const {return mColors;}
+    const SDL_Color* GetColors() const {return mColors;}
+
 private:
     std::vector<std::vector<int>> mGrid;
-    int mColumnsSize;
-    int mRowsSize;
-    float mCellSize;
+    int mColumns;
+    int mRows;
+    int mCell;
 
     const SDL_Color mColors[8];
 };

@@ -12,6 +12,10 @@ public:
     void AddActor(class Actor* actor);
     void RemoveActor(class Actor* actor);
 
+    class Board* GetBoard() const {return mBoard;}
+    int GetBoardColumns() const {return mBoardColumns;}
+    int GetBoardCell() const {return mBoardCell;}
+
 private:
     void ProcessInput();
     void UpdateGame();
@@ -25,9 +29,9 @@ private:
     Uint32 mTicksCount;
     bool mIsRunning;
 
-    int mBoardColumns;
-    int mBoardRows;
-    float mBoardCell;
+    const int mBoardColumns;
+    const int mBoardRows;
+    const int mBoardCell;
 
     std::vector<class Actor*> mActors;
 

@@ -1,4 +1,5 @@
 #include"Piece.h"
+#include"Board.h"
 #include"Game.h"
 #include<cstdlib>
 #include<ctime>
@@ -17,11 +18,12 @@ Piece::Piece(Game* game)
 :Actor(game)
 ,mPosition(Vector2{0,0})
 ,mType(0)
-,mPrevLeftKey(false)
-,mPrevRightKey(false)
-,mPrevRotateKey(false)
+,mPrevA(false)
+,mPrevD(false)
+,mPrevW(false)
 ,mSpeed(0.0f)
 ,mDropSpeed(0.0f)
+,mDropAccumulate(0.0f)
 {
     srand((unsigned)time(nullptr));
     Spawn();
@@ -75,11 +77,11 @@ void Piece::Update(float deltaTime){
     mDropAccumulate+=deltaTime;
     if(mDropAccumulate<mDropSpeed) return;
 
-    mDropAccumulate=0.0f;
+    mDropAccumulate-=mDropSpeed;
     Vector2 nxt[4];
     for(int i=0;i<4;++i) nxt[i]={mBlocks[i].x, mBlocks[i].y+1};
 
-    Board* board=GetGame->GetBoard();
+    Board* board=GetGame()->GetBoard();
     if(board->IsValid(nxt)){
         for(int i=0;i<4;++i) mBlocks[i]=nxt[i];
         mPosition.y++;
@@ -87,5 +89,35 @@ void Piece::Update(float deltaTime){
         board->Lock(mBlocks, mType);
         board->ClearLines();
         Spawn();
+        if(!board->IsValid(mBlocks)) {
+            board->Reset();
+            Spawn();
+        }
+    }
+}
+
+void Piece::Draw(SDL_Renderer* renderer){
+    Board* board=GetGame()->GetBoard();
+    for(int i=0;i<4;++i){
+        if(mBlocks[i].y<0) continue;
+        const SDL_Color& c=board->GetColors()[mType];
+        SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a);
+        int cell=GetGame()->GetBoardCell();
+        SDL_Rect rc={
+            mBlocks[i].x*cell+1,
+            mBlocks[i].y*cell+1,
+            cell-2,
+            cell-2
+        };
+        SDL_RenderFillRect(renderer, &rc);
+    }
+}
+
+void Piece::Rotate(Vector2 out[4]) const {
+    for(int i=0;i<4;++i){
+        int rx=mBlocks[i].x-mPosition.x;
+        int ry=mBlocks[i].y-mPosition.y;
+        out[i].x=mPosition.x+ry;
+        out[i].y=mPosition.y-rx;
     }
 }

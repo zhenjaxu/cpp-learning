@@ -69,7 +69,7 @@ void Game::ProcessInput(){
         mIsRunning=false;
     }
 
-    mPiece->ProcesInput(keyState);
+    mPiece->ProcessInput(keyState);
 }
 
 void Game::UpdateGame(){
@@ -82,7 +82,7 @@ void Game::UpdateGame(){
 }
 
 void Game::GenerateOutput(){
-    SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255);
+    SDL_SetRenderDrawColor(mRenderer, 30, 30, 30, 255);
     SDL_RenderClear(mRenderer);
 
     mBoard->Draw(mRenderer);
@@ -93,13 +93,11 @@ void Game::GenerateOutput(){
 
 void Game::LoadData(){
     mBoard=new Board(this);
-    mBoard->SetColumnsSize(mBoardColumns);
-    mBoard->SetRowsSize(mBoardRows);
-    mBoard->SetCellSize(mBoardCell);
+    mBoard->Init(mBoardColumns, mBoardRows, mBoardCell);
 
     mPiece=new Piece(this);
     mPiece->SetSpeed(0.5f);
-    mPiece->SetDropSpeed(0.05f);
+    mPiece->SetDropSpeed(0.1f);
 }
 
 void Game::UnloadData(){

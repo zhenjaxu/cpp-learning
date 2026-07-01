@@ -28,5 +28,5 @@ private:
     int mRows;
     int mCell;
 
-    const SDL_Color mColors[8];
+    const SDL_Color mColors[7];
 };

@@ -61,6 +61,7 @@ float angle=Math::Acos(dotResult);
 ```cpp
 Vector3 c=Vector3::Cross(a, b);
 ```
+
 ## 游戏的基本运动
 通过向量实现游戏中的基本物理，而移动作为游戏中最基础的物理，将其封装为组件是有意义的。
 ```cpp
@@ -243,6 +244,7 @@ void Laser::UpdateActor(float deltaTime){
     }
 }
 ```
+
 ## 其他游戏逻辑
 玩家通过按下空格，控制飞船朝前发射激光，根据飞船状态设置激光状态。发射激光后，按键进入冷却，并在UpdateActor中恢复。
 ```cpp
@@ -261,6 +263,7 @@ void Ship::UpdateActor(float deltaTime){
     mLaserCooldown-=deltaTime;
 }
 ```
+
 ## 编译和运行
 编写CMakeLists.txt，并在终端编译和调试。
 ```shell
@@ -272,7 +275,9 @@ cmake --build build
 ./build/TravelInSpace
 ```
 游戏运行正常，输入控制正常，图形绘制正常，退出正常。
+
 ![1781947476588](image/README/1781947476588.png)
 
 碰撞正常，冷却正常，清空所有陨石。
+
 ![1781947619416](image/README/1781947619416.png)

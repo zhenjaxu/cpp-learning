@@ -1,6 +1,7 @@
 # 游戏循环和Game类
 ## 开发环境
 以VS Code（mingW64）为开发环境，SDL2为游戏开发库，并使用CMake进行工程构建和管理。
+
 ## 游戏循环
 每一秒都需要对游戏进行**多次更新**，而游戏循环是更新游戏的**循环**。
 ```cpp
@@ -29,6 +30,7 @@ void Game::RunLoop(){
     }
 }
 ```
+
 ## Game类
 整个游戏有一个**骨架**，即Game类。其包含初始化、游戏循环、关闭等功能，而三个私有成员函数（ProcessInput、UpdateGame、GenerateOutput）则是游戏循环的**三要素**。
 ### 基本结构
@@ -186,6 +188,7 @@ SDL_RenderClear(mRenderer);
 ```cpp
 SDL_RenderPresent(mRenderer);
 ```
+
 ## 游戏Pong
 Pong作为游戏编程的helloWorld。其中，球在屏幕上移动，玩家控制球拍击打球。
 ### 绘制图形
@@ -296,7 +299,8 @@ if(
     mBallVel.x*=-1;
 }
 ```
-### 游戏测试
+
+## 游戏测试
 在终端编译运行main文件。
 ```cpp
 cmake -G "MinGW Makefiles" -B build
@@ -304,3 +308,5 @@ cmake --build build
 ./build/game
 ```
 游戏成功运行，小球碰撞正常，球拍移动正常，小球出界后回到中心点。按ECS或退出窗口等能成功退出游戏。
+
+![1783003943139](image/README/1783003943139.png)

@@ -1,6 +1,8 @@
 # 游戏对象与2D图形
+
 ## 简介
 游戏对象，是指在游戏世界中进行更新的、绘制的任何事物。
+
 ## 游戏对象
 ### 类型
 游戏对象有更新并绘制的（如玩家和敌人）、绘制但不更新的（静态对象）、更新但不绘制的（触发器和相机）。
@@ -143,6 +145,7 @@ while(!mActors.empty()){
     delete mActors.back();
 }
 ```
+
 ## 图形加载
 ### 技术栈
 下载SDL2_image，将lib、include合并到SDL2中，再将dll文件复制到当前文件夹中。
@@ -376,6 +379,7 @@ void BGSpriteComponent::Update(float deltaTime){
     }
 }
 ```
+
 ## 游戏逻辑
 实现操控飞船遨游太空。飞船有移动速度，由ProcessKeyboard控制。飞船有动画组件，播放飞行动画。
 ```cpp
@@ -416,6 +420,7 @@ void Ship::UpdateActor(float deltaTime){
     SetPostion(pos);
 }
 ```
+
 ## 编译和运行
 ```shell
 cmake -G "MinGW Makefiles" -B build
@@ -423,4 +428,5 @@ cmake --build build
 ./build/TravelInSpace
 ```
 游戏运行正常，飞船控制正常，边界正常，背景循环不断，退出正常。
+
 ![1780414685790](image/README/1780414685790.png)

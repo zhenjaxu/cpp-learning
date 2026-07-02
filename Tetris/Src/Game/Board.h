@@ -5,15 +5,13 @@
 
 class Board:public Actor{
 public:
-    Board(class Game* game);
+    Board(class Game* game, int columns, int rows, int cell);
 
-    void Init(int columns, int rows, int cell);
     void Draw(SDL_Renderer* renderer) override;
 
     bool IsValid(const Vector2 blocks[4]) const;
     void Lock(const Vector2 blocks[4], int type);
     void ClearLines();
-    void Draw(SDL_Renderer* renderer) const;
     void Reset();
 
     int GetColumns() const {return mColumns;}

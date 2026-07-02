@@ -1,21 +1,16 @@
 #include"Board.h"
 #include"Game.h"
 
-Board::Board(Game* game)
+Board::Board(Game* game, int columns, int rows, int cell)
 :Actor(game)
-,mColumns(0)
-,mRows(0)
-,mCell(0)
+,mColumns(columns)
+,mRows(rows)
+,mCell(cell)
 ,mColors{
     {0,255,255,255}, {128,0,128,255}, {255,255,0,255},
     {255,165,0,255}, {0,0,255,255}, {0,255,0,255}, {255,0,0,255}
 }
-{}
-
-void Board::Init(int columns, int rows, int cell){
-    mColumns=columns;
-    mRows=rows;
-    mCell=cell;
+{
     Reset();
 }
 

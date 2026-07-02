@@ -92,12 +92,9 @@ void Game::GenerateOutput(){
 }
 
 void Game::LoadData(){
-    mBoard=new Board(this);
-    mBoard->Init(mBoardColumns, mBoardRows, mBoardCell);
+    mBoard=new Board(this, mBoardColumns, mBoardRows, mBoardCell);
 
-    mPiece=new Piece(this);
-    mPiece->SetSpeed(0.5f);
-    mPiece->SetDropSpeed(0.1f);
+    mPiece=new Piece(this, 0.5f, 0.1f);
 }
 
 void Game::UnloadData(){

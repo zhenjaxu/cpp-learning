@@ -3,14 +3,11 @@
 
 class Piece:public Actor{
 public:
-    Piece(class Game* game);
+    Piece(class Game* game, float speed, float dropSpeed);
 
     void Update(float deltaTime) override;
     void ProcessInput(const uint8_t* keyState) override;
     void Draw(SDL_Renderer* renderer) override;
-
-    void SetSpeed(float speed){mSpeed=speed;}
-    void SetDropSpeed(float speed){mDropSpeed=speed;}
 
 private:
     void Spawn();

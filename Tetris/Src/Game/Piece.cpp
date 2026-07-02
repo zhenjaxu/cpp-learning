@@ -14,15 +14,15 @@ const Vector2 SHAPES[7][4]={
     {{-1,0},{0,0},{0,1},{1,1}}
 };
 
-Piece::Piece(Game* game)
+Piece::Piece(Game* game, float speed, float dropSpeed)
 :Actor(game)
 ,mPosition(Vector2{0,0})
 ,mType(0)
 ,mPrevA(false)
 ,mPrevD(false)
 ,mPrevW(false)
-,mSpeed(0.0f)
-,mDropSpeed(0.0f)
+,mSpeed(speed)
+,mDropSpeed(dropSpeed)
 ,mDropAccumulate(0.0f)
 {
     srand((unsigned)time(nullptr));

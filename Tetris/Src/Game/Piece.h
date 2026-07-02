@@ -12,14 +12,17 @@ public:
 private:
     void Spawn();
     void Rotate(Vector2 out[4]) const;
+    void CalculateGhost(Vector2 ghost[4]) const;
 
     Vector2 mBlocks[4];
+    Vector2 mGhost[4];
     Vector2 mPosition;
     int mType;
 
     bool mPrevA;
     bool mPrevD;
     bool mPrevW;
+    bool mPrevSpace;
     
     float mSpeed;
     float mDropSpeed;

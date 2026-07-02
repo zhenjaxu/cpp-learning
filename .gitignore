@@ -1,3 +1,6 @@
+bulid/
+*.dll
+*.exe
 *.o
 *.obj
 CMakeCache.txt

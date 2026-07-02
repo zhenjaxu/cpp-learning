@@ -138,3 +138,57 @@ cmake --build build
 ```
 游戏启动和退出正常，方块的移动、旋转、软降控制正常，方块的锁定和行消除正常，方块生成和绘制正常。运行部分截图如下。
 ![1782972506405](image/README/1782972506405.png)
+## 新增功能
+### 幽灵块与硬降
+硬降，即按压空格后，方块直接下落至底。与幽灵块（方块在底下的实时投影）的实现如出一辙。添加私有成员mGhost，并在Spawn调用时以及方块位置角度发生变化时重新计算幽灵块位置。
+```cpp
+// 计算下落到底的位置（幽灵块）
+void Piece::CalculateGhost(Vector2 ghost[4]) const{
+    for(int i=0;i<4;++i) ghost[i]=mBlocks[i];
+
+    Board* board=GetGame()->GetBoard();
+    while(true){
+        Vector2 nxt[4];
+        for(int i=0;i<4;++i) nxt[i]={ghost[i].x, ghost[i].y+1};
+        if(!board->IsValid(nxt)) break;
+        for(int i=0;i<4;++i) ghost[i]=nxt[i];
+    }
+}
+```
+```cpp
+void Piece::Spawn(){
+    // 生成mBlocks...
+    
+    CalculateGhost(mGhost);     // 提前计算幽灵块位置
+}
+```
+```cpp
+// 水平移动或旋转后一次，需重新计算幽灵块
+if((A&&!mPrevA)&&(D&&!mPrevD)&&!(W&&!mPrevW));
+else CalculateGhost(mGhost);
+```
+通过提前与减少不必要计算，来提高游戏性能。在硬降与绘制发生时不必重复计算，通过mGhost直接完成。
+```cpp
+// 硬降，通过幽灵块直接获取降落位置
+if(Space&&!mPrevSpace){
+    for(int i=0;i<4;++i) mBlocks[i]=mGhost[i];
+
+    board->Lock(mBlocks, mType);
+    board->ClearLines();
+    Spawn();
+}
+```
+```cpp
+// 绘制幽灵块
+if(mGhost[i].y<0) continue;     // 如果mGhost[i].y小于0，则mBlocks[i].y也会小于0
+SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);  // 混合模式，绘制时与底色混合
+SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, 80);
+rc.x=mGhost[i].x*cell+1;
+rc.y=mGhost[i].y*cell+1;
+rc.w=cell-2;
+rc.h=cell-2;
+SDL_RenderFillRect(renderer, &rc);
+SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);   // 恢复正常模式，绘制实体块
+```
+下面是新增功能部分截图。
+![1783002077250](image/README/1783002077250.png)

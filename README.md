@@ -9,8 +9,6 @@
 | [`Concurrency/`](./Concurrency) | C++11/14/17 并发编程：线程、锁、条件变量、基于锁的并发数据结构 |
 | [`Game/`](./Game) | 游戏开发学习：游戏模式、SDL2 图形库、游戏循环与游戏对象、CMake 构建 |
 | [`Leetcode/`](./Leetcode) | LeetCode Hot 100 题解，包含思路注释与复杂度分析 |
-| [`ThreadPool/`](./ThreadPool) | 手写线程池实现，练习现代C++并发与模板编程 |
-| [`Tetris/`](./Tetris) | 基于SDL2的俄罗斯方块游戏，实践Actor-Component架构与固定时间步长设计 |
 
 ## 🔨 技术栈
 
@@ -22,13 +20,16 @@
 
 ## 🚀 构建与运行
 
-```bash
+```shell
 # 克隆仓库
-git clone https://github.com/Don-qq/Cpp-learning.git
-cd Cpp-learning
+git clone https://github.com/zhenjaxu/cpp-learning
+cd cpp-learning
 
 # 以 Pong 为例
-cd Game\Programming\Game\Pong
-# cmake -G "MinGW Makefiles" -B build
+cd Game/Programming/Game/Pong
+
+cmake -G "MinGW Makefiles" -B build
 cmake --build build
-.\build\game
+
+./build/game
+```

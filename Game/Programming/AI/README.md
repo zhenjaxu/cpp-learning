@@ -272,3 +272,34 @@ void NavComponent::Update(float deltaTime){
     MoveComponent::Update(deltaTime);
 }
 ```
+## 游戏树
+### 极大极小算法
+```cpp
+// MaxPlayer, AI
+float MaxPlayer(const GTNode* node){
+    if(node->mChildren.empty()){
+        return GetScore(node->mState);
+    }
+
+    float maxValue=-std::numeric_limits<float>::infinity();     // 负无穷
+    for(const GTNode* child:node->mChildren){
+        // 获得对手对弈后的最高分数，保证我方能走出最有利的一步，尽可能获得更高的分数
+        maxValue=std::max(maxValue, MinPlayer(child));
+    }
+    return maxValue;
+}
+
+// MinPlayer, AI假想的劲敌
+float MinPlayer(const GTNode* node){
+    if(node->mChildren.empty()){
+        return GetScore(node->mState);
+    }
+
+    float minValue=std::numeric_limits<float>::infinity();
+    for(const GTNode* child:node->mChildren){
+        // 返回对方下一步的最低分数，辅助其走出最有利的一步
+        minValue=std::min(minValue, MaxPlayer(child));
+    }
+    return minValue;
+}
+```

@@ -1,10 +1,96 @@
 # 人工智能
-## 塔防
+
+## 塔防项目
+
+本项目是一个基于 SDL2 与 CMake 构建的 2D 塔防小游戏，用于学习 C++ 游戏编程中的人工智能技术。玩家通过鼠标点击选择地块并按 `B` 键建造防御塔，敌人飞机会自动寻找从起点到终点的路径并向右进攻；每次建塔都会改变地图可通行区域，敌人会实时使用 A* 算法重新规划路线。项目涵盖了状态机、A* 寻路、导航组件等核心 AI 概念。
+
 ### ✨️特性亮点
+
+- 基于状态机的 AI 行为控制（AIComponent + AIState）
+- A* 寻路算法实现与可视化路径搜索
+- NavComponent 导航组件，让敌人沿路径点移动
+- Actor-Component 游戏对象架构
+- 圆形碰撞组件 CircleComponent
+- 塔防核心玩法：敌人移动、炮塔建造、子弹射击、地块交互
+
 ### 🌲项目结构
+
+```tree
+AI/
+├── Assets/
+│   └── Textures/
+│       ├── Airplane.png
+│       ├── Base.png
+│       ├── Missile.png
+│       ├── Projectile.png
+│       ├── TileBrown.png
+│       ├── TileBrownSelected.png
+│       ├── TileGreen.png
+│       ├── TileGreenSelected.png
+│       ├── TileGrey.png
+│       ├── TileGreySelected.png
+│       ├── TileTan.png
+│       ├── TileTanSelected.png
+│       └── Tower.png
+├── CMakeLists.txt
+└── Src/
+    ├── Engine/
+    │   ├── AI/
+    │   │   ├── AIComponent.cpp
+    │   │   ├── AIComponent.h
+    │   │   ├── AIState.cpp
+    │   │   ├── AIState.h
+    │   │   ├── NavComponent.cpp
+    │   │   └── NavComponent.h
+    │   ├── Core/
+    │   │   ├── Actor.cpp
+    │   │   ├── Actor.h
+    │   │   ├── CircleComponent.cpp
+    │   │   ├── CircleComponent.h
+    │   │   ├── Component.cpp
+    │   │   ├── Component.h
+    │   │   ├── Game.cpp
+    │   │   ├── Game.h
+    │   │   ├── MoveComponent.cpp
+    │   │   └── MoveComponent.h
+    │   ├── Renderer/
+    │   │   ├── SpriteComponent.cpp
+    │   │   └── SpriteComponent.h
+    │   └── Utils/
+    │       ├── Math.cpp
+    │       ├── Math.h
+    │       └── Search.cpp
+    ├── Game/
+    │   ├── Bullet.cpp
+    │   ├── Bullet.h
+    │   ├── Enemy.cpp
+    │   ├── Enemy.h
+    │   ├── Grid.cpp
+    │   ├── Grid.h
+    │   ├── Tile.cpp
+    │   ├── Tile.h
+    │   ├── Tower.cpp
+    │   └── Tower.h
+    └── Main.cpp
+```
+
 ### 🛠️编译环境
+
+- **操作系统**：Windows
+- **编译器**：MinGW-w64 g++ 16.1.0
+- **图形/输入库**：SDL2、SDL2_image
+- **构建工具**：CMake 4.3.2
+
+```shell
+cmake -G "MinGW Makefiles" -B build
+cmake --build build
+./build/TowerDefense
+```
+
 ## 状态机代码
+
 ### 基本实现
+
 ```cpp
 enum AIState{
     Patrol,
@@ -30,6 +116,7 @@ void AIComponent::Update(float deltaTime){
     }
 }
 ```
+
 ```cpp
 void AIComponent::ChangeState(AIState newState){
     // Exit current state
@@ -41,7 +128,9 @@ void AIComponent::ChangeState(AIState newState){
     // ...
 }
 ```
+
 ### 状态类
+
 ```cpp
 class AIState{
 public:
@@ -58,11 +147,13 @@ protected:
     class AIState* mCurrentState;
 };
 ```
+
 ```cpp
 void AIComponent::RegisterState(AIState* state){
     mStateMap.emplace(state->GetName(), state);
 }
 ```
+
 ```cpp
 void AIComponent::Update(float deltaTime){
     if(mCurrentState){
@@ -70,6 +161,7 @@ void AIComponent::Update(float deltaTime){
     }
 }
 ```
+
 ```cpp
 void AIComponent::ChangeState(const std::string& name){
     if(mCurrentState){
@@ -96,6 +188,7 @@ public:
     const char* GetName() const override {return "Patrol";}
 };
 ```
+
 ```cpp
 void AIPatrol::Update(float deltaTime){
     // Do some other updating...
@@ -106,6 +199,7 @@ void AIPatrol::Update(float deltaTime){
     }
 }
 ```
+
 ```cpp
 auto a=new Actor(this);
 auto aic=new AIComponent(a);
@@ -114,8 +208,11 @@ aic->RegisterState(new AIDeath(aic));
 aic->RegisterState(new AIAttack(aic));
 aic->ChangeState("Patrol");
 ```
+
 ## 寻路算法代码
+
 ### 图形
+
 ```cpp
 struct GraphNode{
     std::vector<GraphNode*> mAdjacent;
@@ -137,11 +234,14 @@ struct WeightedGraphNode{
     std::vector<WeightEdge*> mEdges;
 };
 ```
+
 ### 广度优先搜索
+
 ```cpp
 using NodeToParentMap=
     std::unordered_map<const GraphNode*, const GraphNode*>;
 ```
+
 ```cpp
 bool BFS(const Graph& graph, const GraphNode* start,
          const GraphNode* goal, NodeToParentMap& outMap)
@@ -175,7 +275,9 @@ bool BFS(const Graph& graph, const GraphNode* start,
 NodeToParentMap map;
 bool found=BFS(g, g.mNodes[0], g.mNodes[9], map);
 ```
+
 ### 贪婪最佳优先搜索
+
 ```cpp
 struct GBFSScratch{
     const WeightEdge* mParentEdge=nullptr;
@@ -231,7 +333,9 @@ bool BGFS(const WeightedGraph& g, const WeightedGraphNode* start,
     return current==goal;
 }
 ```
+
 ### A*搜索
+
 ```cpp
 for(const WeightedEdge* edge:current->mEdges){
     const WightedGraphNode* neighbor=edge->mTo;
@@ -255,9 +359,13 @@ for(const WeightedEdge* edge:current->mEdges){
     }
 }
 ```
+
 ### Dijkstra算法
+
 将Astar代码转换成迪杰斯特拉代码，只需删除启发值h，相当于h=0的Astar算法。其次，还需删除目标节点，确保搜索完全部节点。该算法能计算出起点到每个节点的最短路径。
+
 ## 跟随路径组件代码
+
 ```cpp
 void NavComponent::TurnTo(const Vector2& pos){
     Vector2 dir=pos-mOwner->GetPosition();
@@ -276,8 +384,11 @@ void NavComponent::Update(float deltaTime){
     MoveComponent::Update(deltaTime);
 }
 ```
+
 ## 游戏树代码
+
 ### 极大极小算法
+
 ```cpp
 // MaxPlayer, AI
 float MaxPlayer(const GTNode* node){
@@ -307,6 +418,7 @@ float MinPlayer(const GTNode* node){
     return minValue;
 }
 ```
+
 ```cpp
 // 通过极大极小算法获取下一步
 const GTNode* MinimaxDecide(const GTNode* root){
@@ -322,7 +434,9 @@ const GTNode* MinimaxDecide(const GTNode* root){
     return choice;
 }
 ```
+
 ### 不完整游戏树
+
 ```cpp
 float MaxPlayerLimit(const GameState* state, int depth){
     if(depth==0||state->IsTerminal()){
@@ -336,7 +450,9 @@ float MaxPlayerLimit(const GameState* state, int depth){
     return maxValue;
 }
 ```
+
 ### α-β剪枝算法
+
 ```cpp
 // 根据α-β剪枝算法获取下一步
 const GameState* AlphaBetaDecide(const GameState* root, int maxDepth){

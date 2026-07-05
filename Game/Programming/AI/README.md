@@ -1,5 +1,10 @@
 # 人工智能
-## 状态机
+## 塔防项目
+### 特性
+### 结构
+### 环境
+### 编译
+## 状态机代码
 ### 基本实现
 ```cpp
 enum AIState{
@@ -110,7 +115,7 @@ aic->RegisterState(new AIDeath(aic));
 aic->RegisterState(new AIAttack(aic));
 aic->ChangeState("Patrol");
 ```
-## 寻路
+## 寻路算法代码
 ### 图形
 ```cpp
 struct GraphNode{
@@ -253,7 +258,7 @@ for(const WeightedEdge* edge:current->mEdges){
 ```
 ### Dijkstra算法
 将Astar代码转换成迪杰斯特拉代码，只需删除启发值h，相当于h=0的Astar算法。其次，还需删除目标节点，确保搜索完全部节点。该算法能计算出起点到每个节点的最短路径。
-## 跟随路径
+## 跟随路径组件代码
 ```cpp
 void NavComponent::TurnTo(const Vector2& pos){
     Vector2 dir=pos-mOwner->GetPosition();
@@ -272,7 +277,7 @@ void NavComponent::Update(float deltaTime){
     MoveComponent::Update(deltaTime);
 }
 ```
-## 游戏树
+## 游戏树代码
 ### 极大极小算法
 ```cpp
 // MaxPlayer, AI
@@ -299,6 +304,92 @@ float MinPlayer(const GTNode* node){
     for(const GTNode* child:node->mChildren){
         // 返回对方下一步的最低分数，辅助其走出最有利的一步
         minValue=std::min(minValue, MaxPlayer(child));
+    }
+    return minValue;
+}
+```
+```cpp
+// 通过极大极小算法获取下一步
+const GTNode* MinimaxDecide(const GTNode* root){
+    const GTNode* choice=nullptr;
+    float maxValue=-std::numeric_limits<float>::infinity();
+    for(const GTNode* child:root->mChildren){
+        float v=MinPlayer(child);
+        if(v>maxValue){
+            maxValue=v;
+            choice=child;
+        }
+    }
+    return choice;
+}
+```
+### 不完整游戏树
+```cpp
+float MaxPlayerLimit(const GameState* state, int depth){
+    if(depth==0||state->IsTerminal()){
+        return state->GetScore();
+    }
+
+    float maxValue=-std::numeric_limits<float>::infinity();
+    for(const GameState* child:state->GetPossibleMoves()){
+        maxValue=std::max(maxValue, MinPlayer(child, depth-1));
+    }
+    return maxValue;
+}
+```
+### α-β剪枝算法
+```cpp
+// 根据α-β剪枝算法获取下一步
+const GameState* AlphaBetaDecide(const GameState* root, int maxDepth){
+    const GameState* choice=nullptr;
+    float maxValue=-std::numeric_limits<float>::infinity();
+    float beta=std::numeric_limits<float>::infinity();
+    for(const GameState* child:root->GetPossibleMoves()){
+        float v=AlphaBetaMin(child, maxDepth-1, maxValue, beta);
+        if(v>maxValue){
+            maxValue=v;
+            choice=child;
+        }
+    }
+    return choice;
+}
+
+// 极大玩家
+float AlphaBetaMax(const GameState* node, int depth, float alpha, float beta){
+    if(depth==0||node->IsTerminal()){
+        return node->GetScore();
+    }
+
+    float maxValue=-std::numeric_limits<float>::infinity();
+    for(const GameState* child:node->GetPossibleMoves()){
+        maxValue=std::max(maxValue, AlphaBetaMin(child, depth-1, alpha, beta));
+
+        // 上层极小玩家已经确保我方能拿到的最低分数为beta，继续遍历maxValue大于等于beta的子树没有意义
+        if(maxValue>=beta){
+            return maxValue;
+        }
+
+        alpha=std::max(maxValue, alpha);    // 不断更新上限
+    }
+    return maxValue;
+}
+
+// 极小玩家
+float AlphaBetaMin(const GameState* node, int depth, float alpha, float beta){
+    if(depth==0||node->IsTerminal()){
+        return node->GetScore();
+    }
+
+    float minValue=std::numeric_limits<float>::infinity();
+    for(const GameState* child:node->GetPossibleMoves()){
+        minValue=std::min(minValue, AlphaBetaMax(child, depth-1, alpha, beta));
+
+        // 上层极大玩家已经确保能拿到最高分数为alpha，继续遍历小于等于alpha的子树没有意义
+        if(minValue<=alpha){
+            return minValue;
+        }
+
+        beta=std::min(minValue, beta);      // 更新下限
     }
     return minValue;
 }

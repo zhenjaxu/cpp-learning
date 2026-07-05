@@ -1,9 +1,46 @@
 # 游戏循环和Game类
-## 开发环境
-以VS Code（mingW64）为开发环境，SDL2为游戏开发库，并使用CMake进行工程构建和管理。
+
+## Pong
+
+本项目是一个基于 SDL2 与 CMake 构建的经典 Pong（乒乓球）小游戏，用于学习 C++ 游戏编程中的核心概念：游戏循环、输入处理、2D 渲染以及基础的碰撞检测。玩家通过 `W` / `S` 键控制左侧球拍，与电脑控制的球拍进行对战。
+
+![Pong 游戏运行截图](image/README/1783003943139.png)
+
+### ✨️特性亮点
+
+- 使用 SDL2 初始化窗口、渲染器与事件系统
+- 经典的三阶段游戏循环：ProcessInput → UpdateGame → GenerateOutput
+- 基于 SDL_Event 的事件轮询与 SDL_GetKeyboardState 键盘状态读取
+- 基于增量时间（deltaTime）的帧率无关运动更新
+- 使用 SDL_RenderFillRect 绘制墙壁、球拍与小球
+- 小球与墙壁、球拍的 AABB/边界碰撞检测与反弹逻辑
+
+### 🌲项目结构
+
+```tree
+Pong/
+├── CMakeLists.txt
+├── Game.hpp
+└── main.cpp
+```
+
+### 🛠️编译环境
+
+- **操作系统**：Windows
+- **编译器**：MinGW-w64 g++ 16.1.0
+- **图形/输入库**：SDL2
+- **构建工具**：CMake 4.3.2
+
+```shell
+cmake -G "MinGW Makefiles" -B build
+cmake --build build
+./build/game
+```
 
 ## 游戏循环
+
 每一秒都需要对游戏进行**多次更新**，而游戏循环是更新游戏的**循环**。
+
 ```cpp
 void Game::RunLoop(){
     while(!mShouldQuit){
@@ -32,8 +69,11 @@ void Game::RunLoop(){
 ```
 
 ## Game类
+
 整个游戏有一个**骨架**，即Game类。其包含初始化、游戏循环、关闭等功能，而三个私有成员函数（ProcessInput、UpdateGame、GenerateOutput）则是游戏循环的**三要素**。
+
 ### 基本结构
+
 ```cpp
 class Game{
 public:
@@ -55,14 +95,18 @@ private:
     bool mIsRuning
 };
 ```
+
 ### 初始化
+
 游戏的初始化在Initialize里完成，成功则返回true，否则返回false。首先是**SDL库**的初始化，标志位包含：
+
 1. SDL_INIT_AUDIO 音频设备管理、回放和录音；
 2. SDL_INIT_VIDEO 创建窗口的视频系统，与OpenGL库和2D图形相连接；
 3. SDL_INIT_HAPTIC 力反馈子系统；
 4. SDL_INIT_GANECONTROLLER 支持控制器输入设备的子系统。
 
 其初始化结果为整型，返回0表示**成功**，非0表示失败。
+
 ```cpp
 int sdlResult=SDL_Init(SDL_INIT_VIDEO);     // Return int, return 0(success)
 
@@ -71,7 +115,9 @@ if(sdlResult!=0){
     return false;
 }
 ```
+
 **窗口**的初始化接收多个参数：窗口标题、左上角的x/y坐标、窗口的宽度/高度，以及可选的任何窗口创建标志。其标志位包含：
+
 1. 0 无要求；
 2. SDL_WINDOW_FULLSCREEN　使用全屏模式；
 3. SDL_WINDOW_FULLSCREEN_DESKTOP 在当前桌面分辨率下使用全屏模式（忽略宽度/高度参数）；
@@ -79,6 +125,7 @@ if(sdlResult!=0){
 5. SDL_WINDOW_RESIZEABLE 允许用户调整窗口大小。
 
 初始化结果保存在成员变量mWindow（SDL_Window的指针类型）中。如果失败，指针置空。
+
 ```cpp
 mWindow=SDL_CreateWindow(
     "Game Programming in C++ (Chapter 1)",  // Window title
@@ -94,16 +141,22 @@ if(!mWindow){
     return false;
 }
 ```
+
 ### 关闭
+
 关闭游戏时则销毁窗口并关闭SDL库。
+
 ```cpp
 void Game::Shutdown(){
     SDL_DestroyWindow(mWindow);
     SDL_Quit();
 }
 ```
+
 ### 游戏循环
+
 mIsRunning查看游戏是否运行。循环内**按顺序**执行用户输入处理、游戏物理更新、绘制和渲染。
+
 ```cpp
 void Game::RunLoop(){
     while(mIsRunning){
@@ -113,8 +166,11 @@ void Game::RunLoop(){
     }
 }
 ```
+
 ### main函数
+
 main.cpp作为程序入口，包含Game.hpp。其内创建Game对象，调用其成员函数。
+
 ```cpp
 int main(int argc, char** argv){
     Game game;
@@ -126,14 +182,19 @@ int main(int argc, char** argv){
     return 0;
 }
 ```
+
 此时，编译运行游戏，成功创建一个空白窗口。
+
 ```cpp
 cmake -G "MinGW Makefiles" -B build
 cmake --build build
 ./build/game
 ```
+
 ### 基本输入处理
+
 SDL库管理一个从操作系统接收事件的内部队列。除了SDL自动处理的事件（如移动窗口），其他事件（如按键的输入）处理需在ProcessInput中实现。SDL_PollEvent用于获取队列中的事件，成功后会返回true。
+
 ```cpp
 SDL_Event event;
 // While there are still events in the queue
@@ -147,21 +208,27 @@ while(SDL_PollEvent(&event)){
     }
 }
 ```
+
 SDL_GetKeyboardState获取键盘的整个状态，返回状态数组的指针。
+
 ```cpp
 const Uint8* state=SDL_GetKeyboardState(NULL);      // Return an array pointer
 if(state[SDL_SCANCODE_ESCAPE]){
     mIsRunning=false;
 }
 ```
+
 ### 2D图形
+
 渲染器renderer的初始化和销毁。其初始化参数包含：窗口指针、默认值、标志位。只用一个窗口时，默认值为-1。标志位包含：
+
 1. SDL_RENDERER_ACCELERATED 图形加速；
 2. SDL_RENDERER_PRESENTVSYNC 垂直同步（双缓冲）。
 
 ```cpp
 SDL_Renderer* mRenderer;
 ```
+
 ```cpp
 mRenderer=SDL_CreateRenderer(
     mWindow,        // Window to create renderer for
@@ -169,10 +236,13 @@ mRenderer=SDL_CreateRenderer(
     SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC
 );
 ```
+
 ```cpp
 SDL_DestroyRenderer(mRenderer);
 ```
+
 基本绘制由SDL_SetRenderDrawColor、SDL_RenderClear、SDL_RenderPresent完成。除了渲染器指针，颜色设置还需传入RGBA四元组设置颜色和透明度。
+
 ```cpp
 SDL_SetRenderDrawColor(
     mRenderer,
@@ -182,17 +252,23 @@ SDL_SetRenderDrawColor(
     255     // A
 );
 ```
+
 ```cpp
 SDL_RenderClear(mRenderer);
 ```
+
 ```cpp
 SDL_RenderPresent(mRenderer);
 ```
 
 ## 游戏Pong
+
 Pong作为游戏编程的helloWorld。其中，球在屏幕上移动，玩家控制球拍击打球。
+
 ### 绘制图形
+
 使用渲染器绘制墙壁、球和球拍。通过SDL_Rect结构体指定位置（左上角）和尺寸。
+
 ```cpp
 SDL_Rect wall{
     0,           // Top left x
@@ -201,17 +277,22 @@ SDL_Rect wall{
     thickness   // Height (const int (15))
 };
 ```
+
 设置渲染器颜色并用SDL_RenderFillRect填充矩形。填充矩形的参数传入矩形的**地址**。
+
 ```cpp
 SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);
 SDL_RenderFillRect(mRenderer, &wall);
 ```
+
 使用Position类型的成员变量存放球和球拍的位置。球和球拍都以中心点为坐标，矩形创建的时候x和y需偏移。
+
 ```cpp
 struct Position{
     float x, y;
 };
 ```
+
 ```cpp
 SDL_Rect ball{
     static_cast<int>(mBallPos.x-thickness/2),
@@ -226,21 +307,29 @@ SDL_Rect paddle{
     paddleH           // Height of the paddle (const int (100))
 };
 ```
+
 ### 更新游戏
+
 该种更新方式固定更新步长，不同处理器上移动速度**不同**。
+
 ```cpp
 // Update x position by 5 pixels
 enemy.mPosition.x+=5;
 ```
+
 该种更新方式根据**增量时间**动态更新，不同处理器上移动速度**一致**。
+
 ```cpp
 // Update x position by 150 pixels/second
 enemy.mPosition.x+=150*deltaTime;
 ```
+
 成员变量mTicksCount（初始化时为0）记录时间（单位ms）。通过SDL_GetTicks获取当前帧时间并减去上一帧记录的时间，得到增量时间deltaTime（单位s）。同时防止暂停等操作导致的增量时间过大，游戏跨度也会很大。在处理器提前完成该帧任务后进入休息，直到帧间隔时间过完后进入下一帧的游戏更新。
+
 ```cpp
 Uint32 mTicksCount;
 ```
+
 ```cpp
 // Delta time is the difference in ticks from last frame
 // (converted to seconds)
@@ -256,7 +345,9 @@ if(deltaTime>0.05f) deltaTime=0.05f;
 // Wait until 16ms has elapsed since last frame
 while(!SDL_TICKS_PASSED(SDL_GetTicks(), mTicksCount+16));
 ```
+
 根据按键输入，更新球拍位置。球拍移动方向在输入处理中实现，球拍位置更新在游戏更新中实现。
+
 ```cpp
 mPaddleDir=0;
 if(state[SDL_SCANCODE_W]){
@@ -266,6 +357,7 @@ if(state[SDL_SCANCODE_S]){
     mPaddleDir+=1;
 }
 ```
+
 ```cpp
 if(mPaddleDir!=0){
     mPaddlePos.y+=mPaddleDir*300.0f*deltaTime;
@@ -277,16 +369,20 @@ if(mPaddleDir!=0){
     }
 }
 ```
+
 球的位置更新同样在游戏更新中，但需先检测球与球拍或墙的碰撞，确定其运动方向。
+
 ```cpp
 mBallPos.x+=mBallVel.x*deltaTime;
 mBallPos.y+=mBallVel.y*deltaTime;
 ```
+
 ```cpp
 if(mBallPos.y<=thickness&&mBallVel.y<0.0f){
     mBallPos.y*=-1;
 }
 ```
+
 ```cpp
 if(
     // Our y-difference is small enough
@@ -299,14 +395,3 @@ if(
     mBallVel.x*=-1;
 }
 ```
-
-## 游戏测试
-在终端编译运行main文件。
-```cpp
-cmake -G "MinGW Makefiles" -B build
-cmake --build build
-./build/game
-```
-游戏成功运行，小球碰撞正常，球拍移动正常，小球出界后回到中心点。按ECS或退出窗口等能成功退出游戏。
-
-![1783003943139](image/README/1783003943139.png)

@@ -10,7 +10,7 @@ NavComponent::NavComponent(Actor* owner)
 void NavComponent::Update(float deltaTime){
     if(mNextNode){
         Vector2 diff=mOwner->GetPosition()-mNextNode->GetPosition();
-        if(diff.LengSq<=2.0f*2.0f){
+        if(diff.LengthSq()<=2.0f*2.0f){
             mNextNode=mNextNode->GetParent();
             TurnTo(mNextNode->GetPosition());
         }

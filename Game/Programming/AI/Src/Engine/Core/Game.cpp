@@ -220,7 +220,7 @@ void Game::AddSprite(SpriteComponent* sprite){
 
 void Game::RemoveSprite(SpriteComponent* sprite){
     auto iter=std::find(mSprites.begin(), mSprites.end(), sprite);
-    mSprites.erase(iter);
+    if(iter!=mSprites.end()) mSprites.erase(iter);
 }
 
 Enemy* Game::GetNearestEnemy(const Vector2& pos){

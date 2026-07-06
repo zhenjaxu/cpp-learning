@@ -13,7 +13,7 @@ Tile::Tile(Game* game)
 ,mBlocked(false)
 ,mSelected(false)
 ,mInOpenSet(false)
-,mInCloseSet(false)
+,mInClosedSet(false)
 {
     mSprite=new SpriteComponent(this);
     UpdateTexture();

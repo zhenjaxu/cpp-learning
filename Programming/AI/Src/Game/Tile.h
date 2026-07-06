@@ -30,7 +30,7 @@ private:
     Tile* mParent;
     float f, g, h;
     bool mInOpenSet;
-    bool mInCloseSet;
+    bool mInClosedSet;
     bool mBlocked;
     bool mSelected;
 

@@ -92,7 +92,7 @@ cmake --build build
 ## 状态机代码
 
 ### 基本实现
-假设敌人三种状态
+状态机表示当前状态，通过特定输入或条件触发状态间转换，即退出当前状态，进入指定状态。
 ```cpp
 enum AIState{
     Patrol,
@@ -100,7 +100,7 @@ enum AIState{
     Attack
 };
 ```
-
+传统状态转换通过switch完成，如果状态多，条件复杂，则switch代码冗长复杂。
 ```cpp
 void AIComponent::Update(float deltaTime){
     switch(mState){
@@ -118,7 +118,8 @@ void AIComponent::Update(float deltaTime){
     }
 }
 ```
-
+### 状态类代码
+状态机通过一个基类，每个状态通过继承维护特定子类。调用出入函数，实现状态转换。这样的状态转换符合[**状态模式**](../../Patterns/4.%20状态模式/README.md)，逻辑清晰。
 ```cpp
 void AIComponent::ChangeState(AIState newState){
     // Exit current state
@@ -130,10 +131,8 @@ void AIComponent::ChangeState(AIState newState){
     // ...
 }
 ```
-
-### 状态类
-
 ```cpp
+// 状态机基类
 class AIState{
 public:
     AIState(class AIComponent* owner)
@@ -141,46 +140,15 @@ public:
     {}
 
     virtual void Update(float deltaTime)=0;
-    virtual void OnEnter()=0;
-    virtual void OnExit()=0;
+    virtual void OnEnter()=0;   // 入口函数
+    virtual void OnExit()=0;    // 出口函数
     virtual const char* GetName() const =0;
 protected:
-    std::unordered_map<std::string, class AIState*> mStateMap;
-    class AIState* mCurrentState;
+    class AIComponent* mOwner;
 };
 ```
-
 ```cpp
-void AIComponent::RegisterState(AIState* state){
-    mStateMap.emplace(state->GetName(), state);
-}
-```
-
-```cpp
-void AIComponent::Update(float deltaTime){
-    if(mCurrentState){
-        mCurrentState->Update(deltaTime);
-    }
-}
-```
-
-```cpp
-void AIComponent::ChangeState(const std::string& name){
-    if(mCurrentState){
-        mCurrentState->OnExit();
-    }
-    auto iter=mStateMap.find(name);
-    if(iter!=mStateMap.end()){
-        mCurrentState=iter->second;
-        mCurrentState->OnEnter();
-    }else{
-        SDL_Log("Could not find AIState %s in state map", name.c_str());
-        mCurrentState=nullptr;
-    }
-}
-```
-
-```cpp
+// 巡逻
 class AIPatrol:public AIState{
 public:
     AIPatrol(class AIComponent* owner);
@@ -190,60 +158,108 @@ public:
     const char* GetName() const override {return "Patrol";}
 };
 ```
-
 ```cpp
 void AIPatrol::Update(float deltaTime){
     // Do some other updating...
 
+    // 判断死亡条件，转换状态
     bool dead=IsDead();
     if(dead){
         mOwner->ChangeState("Death");
     }
 }
 ```
-
+### 状态组件代码
 ```cpp
+// 通过AIComponent管理AIState
+class AIComponent:public Component{
+public:
+    AIComponent(class Actor* owner);
+
+    void Update(float deltaTime) override;
+    void ChangeState(const std::string& name);
+
+    void RegisterState(class AIState* state);
+
+private:
+    std::unordered_map<std::string, class AIState*> mStateMap;  // 状态表
+    class AIState* mCurrentState;
+};
+```
+```cpp
+// 注册状态
+void AIComponent::RegisterState(AIState* state){
+    mStateMap.emplace(state->GetName(), state);
+}
+```
+```cpp
+void AIComponent::Update(float deltaTime){
+    if(mCurrentState){
+        mCurrentState->Update(deltaTime);   // 通过当前状态的更新函数进行特定更新
+    }
+}
+```
+```cpp
+void AIComponent::ChangeState(const std::string& name){
+    if(mCurrentState){
+        mCurrentState->OnExit();    // 退出当前状态
+    }
+
+    auto iter=mStateMap.find(name);
+    if(iter!=mStateMap.end()){
+        mCurrentState=iter->second;
+        mCurrentState->OnEnter();   // 进入新状态
+    }else{
+        SDL_Log("Could not find AIState %s in state map", name.c_str());
+        mCurrentState=nullptr;
+    }
+}
+```
+### 状态机示例
+```cpp
+// 创建AI对象
 auto a=new Actor(this);
 auto aic=new AIComponent(a);
+// 注册全部状态
 aic->RegisterState(new AIPatrol(aic));
 aic->RegisterState(new AIDeath(aic));
 aic->RegisterState(new AIAttack(aic));
+// 切换状态
 aic->ChangeState("Patrol");
 ```
-
 ## 寻路算法代码
 
 ### 图形
-
+图形的节点和边作为路径的基础，是寻路算法中的重要数据结构。
 ```cpp
+// 地图节点
 struct GraphNode{
-    std::vector<GraphNode*> mAdjacent;
+    std::vector<GraphNode*> mAdjacent;  // 相邻节点
 };
-
+// 地图
 struct Graph{
     std::vector<GraphNode*> mNodes;
 };
 ```
-
 ```cpp
+// 带权重的边
 struct WeightedEdge{
     struct WeightGraphNode* mFrom;
     struct WeightGraphNode* mTo;
     float mWeight;
 };
-
+// 节点
 struct WeightedGraphNode{
     std::vector<WeightEdge*> mEdges;
 };
 ```
 
 ### 广度优先搜索
-
+广搜通过队列，不断将附近节点加入队列，直至找到终点或队列为空结束。其缺点是无条件将附近节点加入队列，搜索范围广，搜索时间长。
 ```cpp
 using NodeToParentMap=
     std::unordered_map<const GraphNode*, const GraphNode*>;
 ```
-
 ```cpp
 bool BFS(const Graph& graph, const GraphNode* start,
          const GraphNode* goal, NodeToParentMap& outMap)
@@ -255,7 +271,7 @@ bool BFS(const Graph& graph, const GraphNode* start,
     while(!q.empty()){
         const GraphNode* current=q.front();
         q.pop();
-        if(current=goal){
+        if(current==goal){      // 搜索到后退出
             pathFound=true;
             break;
         }
@@ -263,23 +279,22 @@ bool BFS(const Graph& graph, const GraphNode* start,
         for(const GraphNode* node:current->mAdjacent){
             const GraphNode* parent=outMap[node];
             if(parent==nullptr&&node!=start){
-                outMap[node]=current;
+                outMap[node]=current;       // outMap记录路径
                 q.emplace(node);
             }
-        }
-
-        return pathFound;
+        } 
     }
+    return pathFound;
 }
 ```
-
 ```cpp
+// 代码示例
 NodeToParentMap map;
 bool found=BFS(g, g.mNodes[0], g.mNodes[9], map);
 ```
 
 ### 贪婪最佳优先搜索
-
+贪婪优先搜索通过计算启发量（到终点的距离）并将附近节点加入队列，选取队列中启发量最小的作为下一个节点。搜索时间更短，但搜索出来的路径不一定最短。
 ```cpp
 struct GBFSScratch{
     const WeightEdge* mParentEdge=nullptr;
@@ -288,14 +303,12 @@ struct GBFSScratch{
     bool mInCloseSet=false;
 };
 ```
-
 ```cpp
 using GBFSMap=
     std::unordered_map<const WeightGraphNode*, GBFSScratch>;
 ```
-
 ```cpp
-bool BGFS(const WeightedGraph& g, const WeightedGraphNode* start,
+bool GBFS(const WeightedGraph& g, const WeightedGraphNode* start,
           const WeightedGraphNode* goal, GBFSMap& outMap)
 {
     std::vector<const WeightedGraphNode*> openSet;    // 存放即将搜索的节点
@@ -337,7 +350,7 @@ bool BGFS(const WeightedGraph& g, const WeightedGraphNode* start,
 ```
 
 ### A*搜索
-
+A*算法对贪婪优先搜索进行改进，计入成本，选取成本（已经走过的距离）与启发量之和最小的作为下一个节点。选出路径最短。
 ```cpp
 for(const WeightedEdge* edge:current->mEdges){
     const WightedGraphNode* neighbor=edge->mTo;
@@ -361,14 +374,12 @@ for(const WeightedEdge* edge:current->mEdges){
     }
 }
 ```
-
 ### Dijkstra算法
-
 将Astar代码转换成迪杰斯特拉代码，只需删除启发值h，相当于h=0的Astar算法。其次，还需删除目标节点，确保搜索完全部节点。该算法能计算出起点到每个节点的最短路径。
-
 ## 跟随路径组件代码
-
+计算出路径后，AI通过跟随路径组件（移动组件子类），沿着既定路线移动。
 ```cpp
+// 转向，传入下一节点位置
 void NavComponent::TurnTo(const Vector2& pos){
     Vector2 dir=pos-mOwner->GetPosition();
     float angle=Math::Atan2(-dir.y, dir.x);
@@ -386,11 +397,10 @@ void NavComponent::Update(float deltaTime){
     MoveComponent::Update(deltaTime);
 }
 ```
-
 ## 游戏树代码
-
+对于棋类、决策类游戏，游戏树记录局势变化，是AI决策的基础。
 ### 极大极小算法
-
+AI作为极大玩家，尽可能获得最高的分数。而极小玩家作为AI假象的劲敌，阻止其获得更高的分数。
 ```cpp
 // MaxPlayer, AI
 float MaxPlayer(const GTNode* node){
@@ -420,7 +430,6 @@ float MinPlayer(const GTNode* node){
     return minValue;
 }
 ```
-
 ```cpp
 // 通过极大极小算法获取下一步
 const GTNode* MinimaxDecide(const GTNode* root){
@@ -438,7 +447,7 @@ const GTNode* MinimaxDecide(const GTNode* root){
 ```
 
 ### 不完整游戏树
-
+在较复杂的对弈游戏中，游戏树庞大复杂，对性能并不友好。通过一定深度的搜索，获取部分游戏树进行决策则更为合适。
 ```cpp
 float MaxPlayerLimit(const GameState* state, int depth){
     if(depth==0||state->IsTerminal()){
@@ -452,9 +461,8 @@ float MaxPlayerLimit(const GameState* state, int depth){
     return maxValue;
 }
 ```
-
 ### α-β剪枝算法
-
+通过alpha（上限，当前能保证获得的最高分数）和beta（下限，当前能拿到的最低分数）对搜索剪枝，增加搜索速度和深度。
 ```cpp
 // 根据α-β剪枝算法获取下一步
 const GameState* AlphaBetaDecide(const GameState* root, int maxDepth){

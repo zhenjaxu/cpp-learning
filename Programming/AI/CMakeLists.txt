@@ -17,8 +17,6 @@ set(SRC_FILES
     Src/Engine/Core/MoveComponent.cpp
     Src/Engine/Core/CircleComponent.cpp
     Src/Engine/Renderer/SpriteComponent.cpp
-    Src/Engine/AI/AIState.cpp
-    Src/Engine/AI/AIComponent.cpp
     Src/Engine/AI/NavComponent.cpp
     Src/Engine/Utils/Math.cpp
 )

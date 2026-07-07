@@ -1,9 +1,8 @@
 #include"CircleComponent.h"
 #include"Actor.h"
-#include"Math.h"
 
-CircleComponent::CircleComponent(class Actor* owner, int updateOrder)
-:Component(owner, updateOrder)
+CircleComponent::CircleComponent(class Actor* owner)
+:Component(owner)
 ,mRadius(0.0f)
 {}
 

@@ -1,5 +1,6 @@
 #include"Bullet.h"
 #include"Game.h"
+#include"Enemy.h"
 #include"SpriteComponent.h"
 #include"MoveComponent.h"
 #include"CircleComponent.h"

@@ -31,7 +31,7 @@ Enemy::~Enemy(){
     auto iter=std::find(GetGame()->GetEnemies().begin(),
                         GetGame()->GetEnemies().end(),
                         this);
-    if(iter!=GetGame()->GetEnemies().end()) GetGame()->GetEnemies().earse(iter);                   
+    if(iter!=GetGame()->GetEnemies().end()) GetGame()->GetEnemies().erase(iter);                   
 }
 
 void  Enemy::UpdateActor(float deltaTime){

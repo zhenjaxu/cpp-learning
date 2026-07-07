@@ -1,7 +1,8 @@
-#include"Actor"
-#include<SDL2/SDL.h>
+#include"Actor.h"
 #include"Game.h"
 #include"Component.h"
+#include<SDL2/SDL.h>
+#include<algorithm>
 
 Actor::Actor(Game* game)
 :mGame(game)
@@ -23,7 +24,7 @@ Actor::~Actor(){
 
 void Actor::Update(float deltaTime){
     if(mState==EActive){
-        UpdateCompnents(deltaTime);
+        UpdateComponents(deltaTime);
         UpdateActor(deltaTime);
     }
 }

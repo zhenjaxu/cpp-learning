@@ -25,7 +25,7 @@ private:
     float mNextEnemy;
     
     const size_t NumRows=7;
-    const sizt_t NumCols=16;
+    const size_t NumCols=16;
     const float StartY=192.0f;
     const float TileSize=64.0f;
     const float EnemyTime=1.0f;

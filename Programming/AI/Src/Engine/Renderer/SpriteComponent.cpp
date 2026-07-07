@@ -34,6 +34,8 @@ void SpriteComponent::Draw(SDL_Renderer* renderer){
 }
 
 void SpriteComponent::SetTexture(SDL_Texture* texture){
+    if(!texture) return;
+    
     mTexture=texture;
     SDL_QueryTexture(
         texture, 

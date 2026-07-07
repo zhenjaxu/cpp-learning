@@ -13,23 +13,23 @@ Tower::Tower(Game* game)
     sc->SetTexture(game->GetTexture("Assets/Textures/Tower.png"));
 }
 
-Tower::UpdateActor(float deltaTime){
+void Tower::UpdateActor(float deltaTime){
     Actor::UpdateActor(deltaTime);
 
     mNextAttack-=deltaTime;
-    if(mNextAttack<=0.0f){
-        Enemy* e=GetGame()->GetNearestEnemy(GetPosition());
-        if(e){
-            Vector2 dir=e->GetPosition()-GetPosition();
-            float distSq=dir.LengSq();
-            if(distSq<AttackRange*AttackRange){
-                SetRotation(Math::Atan2(-dir.y, dir.x));
+    Enemy* e=GetGame()->GetNearestEnemy(GetPosition());
+    if(e){
+        Vector2 dir=e->GetPosition()-GetPosition();
+        float distSq=dir.LengthSq();
+        if(distSq<AttackRange*AttackRange){
+            SetRotation(Math::Atan2(-dir.y, dir.x));
 
+            if(mNextAttack<=0.0f){
                 auto b=new Bullet(GetGame());
                 b->SetPosition(GetPosition());
                 b->SetRotation(GetRotation());
+                mNextAttack=AttackTime;
             }
-            mNextAttack+=AttackTime;
-        }else mNextAttack=0.0f;     // 确保第一次遇到敌人能攻击
+        }
     }
 }

@@ -33,24 +33,25 @@ void Tile::UpdateTexture(){
     std::string text;
     switch(mTileState){
         case EStart:
-            text="Assets/Texture/TileTan.png";
+            text="Assets/Textures/TileTan.png";
             break;
         case EBase:
-            text="Assets/Texture/TileGreen.png";
+            text="Assets/Textures/TileGreen.png";
             break;
         case EPath:
             if(mSelected){
-                text="Assets/Texture/TileGreySelected.png";
+                text="Assets/Textures/TileGreySelected.png";
             }else{
-                text="Assets/Texture/TileGrey.png";
+                text="Assets/Textures/TileGrey.png";
             }
             break;
         case EDefault:
             if(mSelected){
-                text="Assets/Texture/TileBrownSelected.png";
+                text="Assets/Textures/TileBrownSelected.png";
             }else{
-                text="Assets/Texture/TileBrown.png";
+                text="Assets/Textures/TileBrown.png";
             }
             break;
     }
+    mSprite->SetTexture(GetGame()->GetTexture(text));
 }

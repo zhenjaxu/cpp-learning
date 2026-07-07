@@ -19,7 +19,7 @@ void NavComponent::Update(float deltaTime){
     MoveComponent::Update(deltaTime);
 }
 
-void NavComponent::StartPath(Tile* start){
+void NavComponent::StartPath(const Tile* start){
     mNextNode=start->GetParent();
     TurnTo(mNextNode->GetPosition());
 }

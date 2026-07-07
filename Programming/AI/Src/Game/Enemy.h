@@ -10,5 +10,5 @@ public:
     class CircleComponent* GetCircle() const {return mCircle;}
 
 private:
-    class CircleComponent* mCirclr;
+    class CircleComponent* mCircle;
 };

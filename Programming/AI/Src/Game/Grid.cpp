@@ -3,6 +3,7 @@
 #include"Tile.h"
 #include"Enemy.h"
 #include"Tower.h"
+#include"Math.h"
 #include<algorithm>
 
 Grid::Grid(Game* game)
@@ -15,9 +16,9 @@ Grid::Grid(Game* game)
     }
 
     for(size_t i=0;i<NumRows;++i){
-        for(size_t j=0;i<NumCols;++j){
-            mTiles[i][j]=new Tile(GetGame());
-            mTiles[i][j]->SetPosition(Vector2(TileSize/2.0f+j*TileSize, StartY+i*TileSize));
+        for(size_t j=0;j<NumCols;++j){
+            mTiles[i][j]=new Tile(game);
+            mTiles[i][j]->SetPosition(Vector2(TileSize/2.0f+j*TileSize, StartY+i*TileSize));    // StartY包含一半的TileSize
         }
     }
 
@@ -25,7 +26,7 @@ Grid::Grid(Game* game)
     GetEndTile()->SetTileState(Tile::EBase);
 
     for(size_t i=0;i<NumRows;++i){
-        for(size_t j=0;i<NumCols;++j){
+        for(size_t j=0;j<NumCols;++j){
             if(i>0){
                 mTiles[i][j]->mAdjacent.emplace_back(mTiles[i-1][j]);
             }
@@ -42,7 +43,7 @@ Grid::Grid(Game* game)
     }
 
     FindPath(GetEndTile(), GetStartTile());  // 查找路径（反向）,可延mParent到达终点
-    UpdatePathTile(GetStartTile());
+    UpdatePathTiles(GetStartTile());
 
     mNextEnemy=EnemyTime;
 }
@@ -68,8 +69,18 @@ void Grid::ProcessClick(int x, int y){
 }
 
 // A*算法搜索路径
-void Grid::FindPath(Tile* start, Tile* goal){
-    std::vector<Tile*> OpenSet;
+bool Grid::FindPath(Tile* start, Tile* goal){
+    for (size_t i=0;i<NumRows;++i)
+	{
+		for (size_t j=0;j<NumCols;++j)
+		{
+			mTiles[i][j]->g=0.0f;
+			mTiles[i][j]->mInOpenSet=false;
+			mTiles[i][j]->mInClosedSet=false;
+		}
+	}
+    
+    std::vector<Tile*> openSet;
     Tile* current=start;
     current->mInOpenSet=true;
     do{
@@ -120,7 +131,7 @@ void Grid::BuildTower(){
         mSelectedTile->mBlocked=true;
         if(FindPath(GetEndTile(), GetStartTile())){
             auto t=new Tower(GetGame());
-            t->SetPosition(mSelectedTile->GetPosition()) 
+            t->SetPosition(mSelectedTile->GetPosition()); 
         }else{
             mSelectedTile->mBlocked=false;
             FindPath(GetEndTile(), GetStartTile());
@@ -131,7 +142,7 @@ void Grid::BuildTower(){
 
 void Grid::SelectTile(size_t row, size_t col){
     Tile::TileState tState=mTiles[row][col]->GetTileState();
-    if(tState!=Tile::EStart&&Tile::EBase){
+    if(tState!=Tile::EStart&&tState!=Tile::EBase){
         // 取消先前的选择
         if(mSelectedTile){
             mSelectedTile->ToggleSelect();

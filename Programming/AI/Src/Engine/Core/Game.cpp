@@ -17,7 +17,7 @@ Game::Game()
 
 bool Game::Initialize(){
     if(SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO)!=0){
-        SDL_Log("Unable to initialize SDL: %s", GetError());
+        SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
         return false;
     }
 
@@ -61,7 +61,7 @@ void Game::RunLoop(){
 }
 
 void Game::Shutdown(){
-    UnloadDate();
+    UnloadData();
     IMG_Quit();
     SDL_DestroyWindow(mWindow);
     SDL_DestroyRenderer(mRenderer);
@@ -78,9 +78,9 @@ void Game::ProcessInput(){
         }
     }
 
-    Uint8* keyState=SDL_GetKeyboard(NULL);
+    const Uint8* keyState=SDL_GetKeyboardState(NULL);
     if(keyState[SDL_SCANCODE_ESCAPE]){
-        mIsRuninng=false;
+        mIsRunning=false;
     }
 
     if(keyState[SDL_SCANCODE_B]){
@@ -89,7 +89,7 @@ void Game::ProcessInput(){
 
     int x, y;
     Uint32 buttons=SDL_GetMouseState(&x, &y);
-    if(SDL_BUTTON(buttonds)&SDL_BUTTON_LEFT){   // 获取鼠标位置和左键信号
+    if(SDL_BUTTON(buttons)&SDL_BUTTON_LEFT){   // 获取鼠标位置和左键信号
         mGrid->ProcessClick(x, y);
     }
 
@@ -101,7 +101,7 @@ void Game::ProcessInput(){
 }
 
 void Game::UpdateGame(){
-    Uin32 targetTicks=mTicksCount+16;
+    Uint32 targetTicks=mTicksCount+16;
     if(SDL_TICKS_PASSED(targetTicks, SDL_GetTicks()+2)){
         SDL_Delay(targetTicks-SDL_GetTicks()-2);    // CPU sleep 到目标时间前1~2ms
     }
@@ -174,7 +174,7 @@ SDL_Texture* Game::GetTexture(const std::string& fileName){
             return nullptr;
         }
 
-        tex=SDL_CreatTextureFromSurface(mRenderer, surf);
+        tex=SDL_CreateTextureFromSurface(mRenderer, surf);
         if(!tex){
             SDL_Log("Failed to convert surface to texture for %s", fileName.c_str());
             return nullptr;

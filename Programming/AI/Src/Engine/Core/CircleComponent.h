@@ -15,4 +15,4 @@ private:
     float mRadius;
 };
 
-bool Intersect(const CircleComponent* a, const CircleComponent* b);     // 碰撞检查
+bool Intersect(const CircleComponent& a, const CircleComponent& b);     // 碰撞检查

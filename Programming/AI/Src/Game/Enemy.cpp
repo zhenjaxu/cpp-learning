@@ -1,10 +1,11 @@
 #include"Enemy.h"
 #include"Game.h"
+#include"Grid.h"
+#include"Tile.h"
+#include"Math.h"
 #include"CircleComponent.h"
 #include"NavComponent.h"
 #include"SpriteComponent.h"
-#include"Grid.h"
-#include"Tile.h"
 #include<algorithm>
 
 Enemy::Enemy(Game* game)
@@ -13,9 +14,9 @@ Enemy::Enemy(Game* game)
     game->GetEnemies().emplace_back(this);
 
     auto sc=new SpriteComponent(this);
-    sc->SetTexture(GetGame()->GetTexture("Assets/Textures/Airplane.png"));
+    sc->SetTexture(game->GetTexture("Assets/Textures/Airplane.png"));
 
-    Tile* start=GetGame()->GetGrid()->GetStartTile();
+    Tile* start=game->GetGrid()->GetStartTile();
     SetPosition(start->GetPosition());
 
     auto nc=new NavComponent(this);

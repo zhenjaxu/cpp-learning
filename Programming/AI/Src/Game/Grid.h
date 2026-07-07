@@ -7,11 +7,9 @@ public:
     Grid(class Game* game);
 
     void UpdateActor(float deltaTime) override;
-
     void ProcessClick(int x, int y);
 
     bool FindPath(class Tile* state, class Tile* goal);
-
     void BuildTower();
 
     class Tile* GetStartTile();
@@ -19,11 +17,9 @@ public:
 
 private:
     void SelectTile(size_t row, size_t col);
-
     void UpdatePathTiles(class Tile* start);
 
     class Tile* mSelectedTile;
-
     std::vector<std::vector<class Tile*>> mTiles;
 
     float mNextEnemy;

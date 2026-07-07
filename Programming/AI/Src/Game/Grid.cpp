@@ -47,7 +47,14 @@ Grid::Grid(Game* game)
     mNextEnemy=EnemyTime;
 }
 
-void Grid::UpdateActor(float deltaTime){}
+void Grid::UpdateActor(float deltaTime){
+    Actor::UpdateActor(deltaTime);
+    mNextEnemy-=deltaTime;
+    if(mNextEnemy<=0.0f){
+        new Enemy(GetGame());   // 自动添加进游戏
+        mNextEnemy+=EnemyTime;
+    }
+}
 
 void Grid::ProcessClick(int x, int y){
     y-=static_cast<int>(StartY-TileSize/2);
@@ -122,14 +129,6 @@ void Grid::BuildTower(){
     }
 }
 
-Tile* Grid::GetStartTile(){
-    return mTiles[3][0];
-}
-
-Tile* Grid::GetEndTile(){
-    return mTiles[3][15];
-}
-
 void Grid::SelectTile(size_t row, size_t col){
     Tile::TileState tState=mTiles[row][col]->GetTileState();
     if(tState!=Tile::EStart&&Tile::EBase){
@@ -146,7 +145,7 @@ void Grid::SelectTile(size_t row, size_t col){
 void Grid::UpdatePathTiles(Tile* start){
     for(size_t i=0;i<NumRows;++i){
         for(size_t j=0;j<NumCols;++j){
-            if(!(i==3&&j==0)&&!(i==3&&j==15)){  // 排除起点和终点
+            if(!(i==3&&j==0)&&!(i==3&&j==15)){      // 排除起点和终点
                 mTiles[i][j]->SetTileState(Tile::EDefault);
             }
         }
@@ -157,4 +156,12 @@ void Grid::UpdatePathTiles(Tile* start){
         t->SetTileState(Tile::EPath);
         t=t->mParent;
     }
+}
+
+Tile* Grid::GetStartTile(){
+    return mTiles[3][0];
+}
+
+Tile* Grid::GetEndTile(){
+    return mTiles[3][15];
 }

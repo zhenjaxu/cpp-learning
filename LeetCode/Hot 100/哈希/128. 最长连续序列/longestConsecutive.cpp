@@ -6,8 +6,8 @@
 class Solution {
 public:
     int longestConsecutive(std::vector<int>& nums) {
-        // return solution1(nums);     // 哈希、并查集
-        return solution2(nums);     // 哈希
+        // return solution1(nums);     // 哈希、并查集，时间复杂度O(NlogN)，空间复杂度O(N)
+        return solution2(nums);     // 哈希，时间复杂度O(N)，空间复杂度O(N)
     }
 
 private:

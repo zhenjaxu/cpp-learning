@@ -6,7 +6,7 @@
 
 ![Pong 游戏运行截图](image/README/1783003943139.png)
 
-### ✨️特性亮点
+### ✨️ 特性亮点
 
 - 使用 SDL2 初始化窗口、渲染器与事件系统
 - 经典的三阶段游戏循环：ProcessInput → UpdateGame → GenerateOutput
@@ -15,7 +15,7 @@
 - 使用 SDL_RenderFillRect 绘制墙壁、球拍与小球
 - 小球与墙壁、球拍的 AABB/边界碰撞检测与反弹逻辑
 
-### 🌲项目结构
+### 🌲 项目结构
 
 ```tree
 Pong/
@@ -24,7 +24,7 @@ Pong/
 └── main.cpp
 ```
 
-### 🛠️编译环境
+### 🛠️ 编译环境
 
 - **操作系统**：Windows
 - **编译器**：MinGW-w64 g++ 16.1.0

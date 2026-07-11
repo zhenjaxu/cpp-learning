@@ -18,10 +18,7 @@ private:
         std::sort(p.begin(), p.end());      // 对p排序
         int pSize=p.size();
         for(int i=0;i<s.size()-pSize+1;++i){    // i不超过sSize-pSize
-            std::string sub="";
-            for(int j=i;j<i+pSize;++j){     // 取pSize大小子串排序，与排序后的p相同则为异位词
-                sub+=s[j];
-            }
+            std::string sub=s.substr(i, pSize);      // 取pSize大小子串排序，与排序后的p相同则为异位词
             std::sort(sub.begin(), sub.end());
             if(sub==p) result.push_back(i);
         }

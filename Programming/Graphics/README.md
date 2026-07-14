@@ -1,6 +1,6 @@
 # 图形渲染
 
-## Pong(3D)
+## TraveInSpace(2D)
 
 ### ✨️ 特性亮点
 
@@ -16,5 +16,5 @@
 ```shell
 cmake -G "MinGW Makefiles" -B build
 cmake --build build
-./build/Pong3D
+./build/TraveInSpace2D
 ```

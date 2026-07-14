@@ -14,7 +14,7 @@ public:
 private:
     unsigned int mNumVerts;
     unsigned int mNumIndices;
-    unsigned int mVertexBuffer;
-    unsigned int mIndexBuffer;
-    unsigned int mVertexArray;
+    unsigned int mVertexBuffer;     // 顶点缓冲id
+    unsigned int mIndexBuffer;      // 索引缓存id
+    unsigned int mVertexArray;      // 顶点数组对象id
 };

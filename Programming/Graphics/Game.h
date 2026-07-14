@@ -13,6 +13,9 @@ private:
     void UpdateGame();
     void GenerateOutput();
 
+    void InitSpriteVerts();
+    class VertexArray mSpriteVerts;
+
     SDL_Window* mWindow;
     SDL_GLContext mContext;     // OpenGL上下文
     bool mIsRunning;

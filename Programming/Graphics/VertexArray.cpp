@@ -1,0 +1,49 @@
+#include"VertexArray.h"
+#include<GL/glew.h>
+
+VertexArray::VertexArray(const float* verts, unsigned int numVerts,
+    const unsigned int* indices, unsigned int numIndices)
+{
+    // 创建顶点数组对象，存储id
+    glGenVertexArrays(1, &mVertexArray);    
+    glBindVertexArray(mVertexArray);
+
+    // 创建顶点缓冲区
+    glGenBuffers(1, &mVertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
+
+    // 复制顶点数据至顶点缓冲区
+    glBufferData(
+        GL_ARRAY_BUFFER,        // 缓冲标签
+        numVerts*3*sizeof(float),       //  拷贝的字节数，xyz三个浮点数
+        verts,           // 资源首地址               
+        GL_STATIC_DRAW      // 表示数据用途
+    );
+
+    // 创建索引缓冲区，与复制数据
+    glGenBuffers(1, &mIndexBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndexBuffer);
+
+    glBufferData(
+        GL_ELEMENT_ARRAY_BUFFER,
+        numIndices*sizeof(unsigned int),
+        indices, GL_STATIC_DRAW
+    );
+
+    // 指定顶点布局，启动顶点属性
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(
+        0,      // 属性id
+        3,      // 分量数量，xyz
+        GL_FLOAT,   // 分量类型
+        GL_FALSE,   // 只与整型相关，这里为false
+        sizeof(float)*3,    // 步幅，连续顶点属性之间的字节偏移量
+        0   // 距离首地址的偏移量，第一个属性为0
+    );
+}
+
+VertexArray::~VertexArray(){
+    glDeleteBuffers(1, &mVertexBuffer);
+    glDeleteBuffers(1, &mIndexBuffer);
+    glDeleteVertexArrays(1, &mVertexArray);
+}

@@ -104,6 +104,12 @@ void Game::GenerateOutput(){
     mSpriteShader->SetActive();
     mSpriteVerts->SetActive();
 
+    glEnable(GL_BLEND);
+    glBlendFunc(
+        GL_SRC_ALPHA,
+        GL_ONE_MINUS_SRC_ALPHA
+    );
+
     for(auto sprite:mSprites){
         sprite->Draw(mSpriteShader);
     }

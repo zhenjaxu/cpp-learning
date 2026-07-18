@@ -11,6 +11,8 @@ void SpriteComponent::Draw(Shader* shader){
     Matrix4 world=scaleMat*mOwner->GetWorldTransform();
     shader->SetMatrixUniform("uWorldTransform", world);
 
+    mTexture->SetActive();
+
     glDrawElements(
         GL_TRIANGLES,       // 绘制形状，三角形
         6,                  // 索引缓冲区中的索引数量

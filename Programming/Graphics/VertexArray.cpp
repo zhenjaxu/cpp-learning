@@ -15,7 +15,7 @@ VertexArray::VertexArray(const float* verts, unsigned int numVerts,
     // 复制顶点数据至顶点缓冲区
     glBufferData(
         GL_ARRAY_BUFFER,        // 缓冲标签
-        numVerts*3*sizeof(float),       //  拷贝的字节数，xyz三个浮点数
+        numVerts*5*sizeof(float),       //  拷贝的字节数，xyz三个浮点数
         verts,           // 资源首地址               
         GL_STATIC_DRAW      // 表示数据用途
     );
@@ -37,8 +37,18 @@ VertexArray::VertexArray(const float* verts, unsigned int numVerts,
         3,      // 分量数量，xyz
         GL_FLOAT,   // 分量类型
         GL_FALSE,   // 只与整型相关，这里为false
-        sizeof(float)*3,    // 步幅，连续顶点属性之间的字节偏移量
+        sizeof(float) * 5,    // 步幅，连续顶点属性之间的字节偏移量
         0   // 距离首地址的偏移量，第一个属性为0
+    );
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(
+        1,
+        2,          // UV坐标
+        GL_FLOAT,
+        GL_FALSE,
+        sizeof(float) * 5,
+        reinterpret_cast<void*>(sizeof(float) * 3);     // 强制转换成 void* 指针
     );
 }
 

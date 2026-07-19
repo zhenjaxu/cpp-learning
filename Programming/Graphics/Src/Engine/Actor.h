@@ -40,9 +40,6 @@ public:
     Vector2 GetForward() const { return Vector2(Math::Cos(mRotation), Math::Sin(mRotation)); }
 
     class Game* GetGame() { return mGame; }
-    
-    void AddComponent(class Component* component);
-    void RemoveComponent(class Component* component);
 
 private:
     State mState;

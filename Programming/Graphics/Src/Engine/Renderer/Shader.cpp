@@ -1,4 +1,7 @@
-#include"Shader.h"
+#include "Shader.h"
+#include <SDL2/SDL.h>
+#include <fstream>
+#include <sstream>
 
 Shader::Shader()
 : mShaderProgram(0)
@@ -70,7 +73,7 @@ bool Shader::CompileShader(const std::string& fileName,
         const char* contentsChar=contents.c_str();
 
         // 生成着色器
-        outShader=glCreatShader(shaderType);
+        outShader=glCreateShader(shaderType);
 
         // 配置资源和编译
         glShaderSource(outShader, 1, &(contentsChar), nullptr);
@@ -112,7 +115,7 @@ bool Shader::IsValidProgram(){
     if(status!=GL_TRUE){
         char buffer[512];
         memset(buffer, 0, 512);
-        glGetProgramInfoLog(shader, 511, nullptr, buffer);   // 获取错误信息
+        glGetProgramInfoLog(mShaderProgram, 511, nullptr, buffer);   // 获取错误信息
         SDL_Log("GLSL Compile Failed:\n%s", buffer);
         return false;
     }

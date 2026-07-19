@@ -36,7 +36,7 @@ VertexArray::VertexArray(const float* verts, unsigned int numVerts,
         GL_FLOAT,
         GL_FALSE,
         sizeof(float) * 5,
-        reinterpret_cast<void*>(sizeof(float) * 3);     // 强制转换成 void* 指针
+        reinterpret_cast<void*>(sizeof(float) * 3)     // 强制转换成 void* 指针
     );
 }
 

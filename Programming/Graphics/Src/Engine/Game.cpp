@@ -18,7 +18,7 @@ Game::Game()
 {}
 
 bool Game::Initialize(){
-    if(SDL_Init(SDL_INTI_VIDEO|SDL_INIT_AUDIO)){
+    if(SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO)){
         SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
         return false;
     }
@@ -43,7 +43,7 @@ bool Game::Initialize(){
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 
     // 创建 OpenGL 窗口
-    mWindow=SDL_CreatWindow("TravelInSpace(2D)", 400, 100, 1024, 768, SDL_WINDOW_OPENGL);
+    mWindow=SDL_CreateWindow("TravelInSpace(2D)", 400, 100, 1024, 768, SDL_WINDOW_OPENGL);
     if(!mWindow){
         SDL_Log("Failed to create window: %s", SDL_GetError());
         return false;

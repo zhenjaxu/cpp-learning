@@ -4,6 +4,7 @@
 #include"Math.h"
 
 class Shader{
+public:
     Shader();
     ~Shader();
 

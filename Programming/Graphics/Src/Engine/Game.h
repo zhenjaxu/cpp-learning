@@ -22,6 +22,7 @@ public:
 	void RemoveAsteroid(class Asteroid* ast);
 
     class Texture* GetTexture(const std::string& fileName);
+    std::vector<class Asteroid*>& GetAsteroids() { return mAsteroids; }
 
 private:
     void ProcessInput();

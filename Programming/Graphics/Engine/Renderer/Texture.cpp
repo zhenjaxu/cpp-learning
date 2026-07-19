@@ -2,8 +2,12 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include <SDL2/SDL.h>
+#include <GL/glew.h>
 
 Texture::Texture()
+:mTextureID(0)
+,mWidth(0)
+,mHeight(0)
 {}
 
 Texture::~Texture()
@@ -36,7 +40,8 @@ bool Texture::Load(const std::string& fileName)
     // 复制图像数据
     glTexImage2D(GL_TEXTURE_2D, 0, format, mWidth, mHeight, 0, format, GL_UNSIGNED_BYTE, image);
 
-    stbi_image_free(image);     // 释放分配的内存
+    // 释放分配的内存
+    stbi_image_free(image);     
 
     // 双线性过滤
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

@@ -1,8 +1,60 @@
 #include"Shader.h"
 
-Shader::Shader(){}
+Shader::Shader()
+: mShaderProgram(0)
+, mVertexShader(0)
+, mFragShader(0)
+{}
 
 Shader::~Shader(){}
+
+// 编译并链接着色器
+bool Shader::Load(const std::string& vertName,
+                  const std::string& fragName)
+{
+    if(!CompileShader(vertName, GL_VERTEX_SHADER, mVertexShader)||
+       !CompileShader(fragName, GL_FRAGMENT_SHADER, mFragShader))
+    {
+        return false;
+    }
+
+    // 生成程序，链接着色器
+    mShaderProgram=glCreateProgram();
+    glAttachShader(mShaderProgram, mVertexShader);
+    glAttachShader(mShaderProgram, mFragShader);
+    glLinkProgram(mShaderProgram);
+
+    if(!IsValidProgram()){
+        return false;
+    }
+
+    return true;
+}
+
+// 删除着色器程序、顶点着色器和片元着色器
+void Shader::Unload(){
+    glDeleteProgram(mShaderProgram);
+    glDeleteShader(mVertexShader);
+    glDeleteShader(mFragShader);
+}
+
+// 设置为活跃状态
+void Shader::SetActive(){
+    glUseProgram(mShaderProgram);
+}
+
+// 包装器
+void Shader::SetMatrixUniform(const char* name, const Matrix4& matrix){
+    GLuint loc=glGetUniformLocation(mShaderProgram, name);      // 获取着色器程序中对应的 uniform 矩阵变量
+    
+    // 包装矩阵
+    glUniformMatrix4fv(
+        loc,
+        1,          // 矩阵数量
+        GL_TRUE,    // 行主序为 true，列主序为 false
+        matrix.GetAsFloatPtr()  // 矩阵数据指针
+    );
+}
 
 // 编译着色器
 bool Shader::CompileShader(const std::string& fileName,
@@ -52,29 +104,6 @@ bool Shader::IsCompiled(GLuint shader){
     return true;
 }
 
-// 编译并链接着色器
-bool Shader::Load(const std::string& vertName,
-                  const std::string& fragName)
-{
-    if(!CompileShader(vertName, GL_VERTEX_SHADER, mVertexShader)||
-       !CompileShader(fragName, GL_FRAGMENT_SHADER, mFragShader))
-    {
-        return false;
-    }
-
-    // 生成程序，链接着色器
-    mShaderProgram=glCreateProgram();
-    glAttachShader(mShaderProgram, mVertexShader);
-    glAttachShader(mShaderProgram, mFragShader);
-    glLinkProgram(mShaderProgram);
-
-    if(!IsValidProgram()){
-        return false;
-    }
-
-    return true;
-}
-
 bool Shader::IsValidProgram(){
     GLint status;
 
@@ -88,29 +117,4 @@ bool Shader::IsValidProgram(){
         return false;
     }
     return true;
-}
-
-// 设置为活跃状态
-void Shader::SetActive(){
-    glUseProgram(mShaderProgram);
-}
-
-// 删除着色器程序、顶点着色器和片元着色器
-void Shader::Unload(){
-    glDeleteProgram(mShaderProgram);
-    glDeleteShader(mVertexShader);
-    glDeleteShader(mFragShader);
-}
-
-// 包装器
-void Shader::SetMatrixUniform(const char* name, const Matrix4& matrix){
-    GLuint loc=glGetUniformLocation(mShaderProgram, name);      // 获取着色器程序中对应的 uniform 矩阵变量
-    
-    // 包装矩阵
-    glUniformMatrix4fv(
-        loc,
-        1,          // 矩阵数量
-        GL_TRUE,    // 行主序为 true，列主序为 false
-        matrix.GetAsFloatPtr()  // 矩阵数据指针
-    );
 }

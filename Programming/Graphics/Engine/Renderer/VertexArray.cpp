@@ -6,29 +6,17 @@ VertexArray::VertexArray(const float* verts, unsigned int numVerts,
 {
     // 创建顶点数组对象，存储id
     glGenVertexArrays(1, &mVertexArray);    
-    glBindVertexArray(mVertexArray);
+    glBindVertexArray(mVertexArray);        // 激活为当前 VAO ID
 
     // 创建顶点缓冲区
     glGenBuffers(1, &mVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
-
-    // 复制顶点数据至顶点缓冲区
-    glBufferData(
-        GL_ARRAY_BUFFER,        // 缓冲标签
-        numVerts*5*sizeof(float),       //  拷贝的字节数，xyz三个浮点数
-        verts,           // 资源首地址               
-        GL_STATIC_DRAW      // 表示数据用途
-    );
+    glBufferData(GL_ARRAY_BUFFER, numVerts * 5 * sizeof(float), verts, GL_STATIC_DRAW);
 
     // 创建索引缓冲区，与复制数据
     glGenBuffers(1, &mIndexBuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndexBuffer);
-
-    glBufferData(
-        GL_ELEMENT_ARRAY_BUFFER,
-        numIndices*sizeof(unsigned int),
-        indices, GL_STATIC_DRAW
-    );
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
     // 指定顶点布局，启动顶点属性
     glEnableVertexAttribArray(0);
@@ -56,4 +44,9 @@ VertexArray::~VertexArray(){
     glDeleteBuffers(1, &mVertexBuffer);
     glDeleteBuffers(1, &mIndexBuffer);
     glDeleteVertexArrays(1, &mVertexArray);
+}
+
+void VertexArray::SetActive()
+{
+	glBindVertexArray(mVertexArray);
 }

@@ -37,6 +37,8 @@ public:
     void SetScale(float scale){mScale=scale; mRecomputeWorldTransform=true;}
     void SetRotation(float rotation){mRotation=rotation; mRecomputeWorldTransform=true;}
 
+    Vector2 GetForward() const { return Vector2(Math::Cos(mRotation), Math::Sin(mRotation)); }
+
     class Game* GetGame() { return mGame; }
     
     void AddComponent(class Component* component);

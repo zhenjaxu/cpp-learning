@@ -1,0 +1,26 @@
+#include "MoveComponent.h"
+#include "Actor.h"
+
+MoveComponent::MoveComponent(class Actor* owner, int updateOrder)
+:Component(owner, updateOrder)
+,mAngularSpeed(0.0f)
+,mForwardSpeed(0.0f)
+{}
+
+void MoveComponent::Update(float deltaTime)
+{
+	if (!Math::NearZero(mAngularSpeed))
+	{
+		Quaternion rot = mOwner->GetRotation();
+		float angle = mAngularSpeed * deltaTime;
+		Quaternion inc(Vecttor3::UnitZ, angle);		// 绕 z 轴旋转
+		rot = Quaternion::Concatenate(rot, inc);	// 先 inc 再 rot
+		mOwner->SetRotation(rot);
+	}
+	
+	if (!Math::NearZero(mForwardSpeed))
+	{
+		Vector3 pos = mOwner->GetPosition();
+		pos += mOwner->GetForward() * mForwardSpeed * deltaTime;
+	}
+}

@@ -1,4 +1,5 @@
 #include "MoveComponent.h"
+#include "Math.h"
 #include "Actor.h"
 
 MoveComponent::MoveComponent(class Actor* owner, int updateOrder)
@@ -13,7 +14,7 @@ void MoveComponent::Update(float deltaTime)
 	{
 		Quaternion rot = mOwner->GetRotation();
 		float angle = mAngularSpeed * deltaTime;
-		Quaternion inc(Vecttor3::UnitZ, angle);		// 绕 z 轴旋转
+		Quaternion inc(Vector3::UnitZ, angle);		// 绕 z 轴旋转
 		rot = Quaternion::Concatenate(rot, inc);	// 先 inc 再 rot
 		mOwner->SetRotation(rot);
 	}

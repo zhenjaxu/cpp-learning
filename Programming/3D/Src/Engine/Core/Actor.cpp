@@ -1,14 +1,14 @@
-#include"Actor.h"
-#include"Game.h"
+#include "Actor.h"
+#include "Game.h"
 #include "Component.h"
 #include <algorithm>
 
 Actor::Actor(Game* game)
 :mGame(game)
 ,mState(EActive)
-,mPosition(Vector2::Zero)
+,mPosition(Vector3::Zero)
 ,mScale(1.0f)
-,mRotation(0.0f)
+,mRotation(Quaternion::Identity)
 ,mRecomputeWorldTransform(true)
 {
     game->AddActor(this);
@@ -25,7 +25,7 @@ Actor::~Actor()
 }
 
 void Actor::Update(float deltaTime){
-    if(mState==EActive){
+    if(mState == EActive){
         ComputeWorldTransform();
 
         UpdateComponents(deltaTime);
@@ -37,7 +37,7 @@ void Actor::Update(float deltaTime){
 
 void Actor::UpdateComponents(float deltaTime)
 {
-    for(auto comp:mComponents)
+    for(auto comp : mComponents)
     {
         comp->Update(deltaTime);
     }

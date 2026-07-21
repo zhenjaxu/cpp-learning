@@ -13,13 +13,7 @@ public:
     void AddActor(class Actor* actor);
     void RemoveActor(class Actor* actor);
 
-    void AddRenderer(class Renderer* mRenderer);
-    void RemoveRenderer(class Renderer* mRenderer);
-
-    void AddAsteroid(class Asteroid* ast);
-	void RemoveAsteroid(class Asteroid* ast);
-
-    std::vector<class Asteroid*>& GetAsteroids() { return mAsteroids; }
+    class Renderer* GetRenderer() const { return mRenderer; }
 
 private:
     void ProcessInput();
@@ -35,8 +29,6 @@ private:
     bool mIsRunning;
     Uint32 mTicksCount;
 
-    class Renderer* mRenderere;
-
-    class Ship* mShip;
-	std::vector<class Asteroid*> mAsteroids;
+    class Renderer* mRenderer;
+    class CameraActor* mCameraActor;
 };

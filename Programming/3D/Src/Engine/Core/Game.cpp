@@ -1,14 +1,14 @@
 #include "Game.h"
 #include "Actor.h"
-#include "Ship.h"
-#include "Asteroid.h"
-#include "Random.h"
-#include <GL/glew.h>
+#include "Renderer.h"
+#include "SpriteComponent.h"
+#include "MeshComponent.h"
+#include "CameraActor.h"
+#include "PlaneActor.h"
 #include <algorithm>
 
 Game::Game()
-: mWindow(nullptr)
-, mSpriteShader(nullptr)
+: mRenderer(nullptr)
 , mIsRunning(true)
 , mUpdatingActors(false)
 {}
@@ -18,6 +18,15 @@ bool Game::Initialize(){
         SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
         return false;
     }
+
+	mRenderer = new Renderer(this);
+	if(!mRenderer->Initialize(1024.0f, 768.0f))
+	{
+		SDL_Log("Failed to initialize renderer");
+		delete mRenderer;
+		mRenderer = nullptr;
+		return false;
+	}
 
     LoadData();
     mTicksCount = SDL_GetTicks();
@@ -73,7 +82,6 @@ void Game::UpdateGame(){
     mUpdatingActors=false;
 
     for(auto pending:mPendingActors){
-        pending->ComputeWorldTransform();       // 加入前，计算世界变换矩阵
         mActors.emplace_back(pending);
     }
     mPendingActors.clear();
@@ -90,43 +98,97 @@ void Game::UpdateGame(){
     }
 }
 
-void Game::GenerateOutput(){
-    glClearColor(0.86f, 0.86f, 0.86f, 1.0f);    // 灰色
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    mSpriteShader->SetActive();
-    mSpriteVerts->SetActive();
-    for(auto sprite:mSprites){
-        sprite->Draw(mSpriteShader);
-    }
-
-    SDL_GL_SwapWindow(mWindow);
+void Game::GenerateOutput()
+{
+    mRenderer->Draw();
 }
 
 void Game::Shutdown()
 {
     UnloadData();
-	delete mSpriteVerts;
-	mSpriteShader->Unload();
-	delete mSpriteShader;
-	SDL_GL_DeleteContext(mContext);
-	SDL_DestroyWindow(mWindow);
+	if(mRenderer)
+	{
+		mRenderer->Shutdown();
+	}
 	SDL_Quit();
 }
 
 void Game::LoadData()
 {
-	mShip = new Ship(this);
-	mShip->SetRotation(Math::PiOver2);
+	// 方块
+	Actor* a = new Actor(this);
+	a->SetPosition(Vector3(200.0f, 75.0f, 0.0f));
+	a->SetScale(100.0f);
+	Quaternion q(Vector3::UnitY, -Math::PiOver2);
+	q = Quaternion::Concatenate(q, Quaternion(Vector3::UnitZ, Math::Pi + Math::Pi / 4.0f));
+	a->SetRotation(q);
+	MeshComponent* mc = new MeshComponent(a);
+	mc->SetMesh(mRenderer->GetMesh("Assets/Cube.gpmesh"));
 
-	const int numAsteroids = 20;
-	for (int i = 0; i < numAsteroids; i++)
+	// 球
+	a = new Actor(this);
+	a->SetPosition(Vector3(200.0f, -75.0f, 0.0f));
+	a->SetScale(3.0f);
+	mc = new MeshComponent(a);
+	mc->SetMesh(mRenderer->GetMesh("Assets/Sphere.gpmesh"));
+
+	// 墙
+	const float start = -1250.0f;
+	const float size = 250.0f;
+	for (int i = 0; i < 10; i++)
 	{
-		new Asteroid(this);
+		for (int j = 0; j < 10; j++)
+		{
+			a = new PlaneActor(this);
+			a->SetPosition(Vector3(start + i * size, start + j * size, -100.0f));
+		}
 	}
+
+	q = Quaternion(Vector3::UnitX, Math::PiOver2);
+	for (int i = 0; i < 10; i++)
+	{
+		a = new PlaneActor(this);
+		a->SetPosition(Vector3(start + i * size, start - size, 0.0f));
+		a->SetRotation(q);
+		
+		a = new PlaneActor(this);
+		a->SetPosition(Vector3(start + i * size, -start + size, 0.0f));
+		a->SetRotation(q);
+	}
+
+	q = Quaternion::Concatenate(q, Quaternion(Vector3::UnitZ, Math::PiOver2));
+	for (int i = 0; i < 10; i++)
+	{
+		a = new PlaneActor(this);
+		a->SetPosition(Vector3(start - size, start + i * size, 0.0f));
+		a->SetRotation(q);
+
+		a = new PlaneActor(this);
+		a->SetPosition(Vector3(-start + size, start + i * size, 0.0f));
+		a->SetRotation(q);
+	}
+
+	// 定向光
+	mRenderer->SetAmbientLight(Vector3(0.2f, 0.2f, 0.2f));
+	DirectionalLight& dir = mRenderer->GetDirectionalLight();
+	dir.mDirection = Vector3(0.0f, -0.707f, -0.707f);
+	dir.mDiffuseColor = Vector3(0.78f, 0.88f, 1.0f);
+	dir.mSpecColor = Vector3(0.8f, 0.8f, 0.8f);
+
+	// 相机
+	mCameraActor = new CameraActor(this);
+
+	// UI
+	a = new Actor(this);
+	a->SetPosition(Vector3(-350.0f, -350.0f, 0.0f));
+	SpriteComponent* sc = new SpriteComponent(a);
+	sc->SetTexture(mRenderer->GetTexture("Assets/HealthBar.png"));
+
+	a = new Actor(this);
+	a->SetPosition(Vector3(375.0f, -275.0f, 0.0f));
+	a->SetScale(0.75f);
+	sc = new SpriteComponent(a);
+	sc->SetTexture(mRenderer->GetTexture("Assets/Radar.png"));
 }
 
 void Game::UnloadData()
@@ -136,25 +198,9 @@ void Game::UnloadData()
 		delete mActors.back();
 	}
 
-	for (auto i : mTextures)
+	if(mRenderer)
 	{
-		i.second->Unload();
-		delete i.second;
-	}
-	mTextures.clear();
-}
-
-void Game::AddAsteroid(Asteroid* ast)
-{
-	mAsteroids.emplace_back(ast);
-}
-
-void Game::RemoveAsteroid(Asteroid* ast)
-{
-	auto iter = std::find(mAsteroids.begin(), mAsteroids.end(), ast);
-	if (iter != mAsteroids.end())
-	{
-		mAsteroids.erase(iter);
+		mRenderer->UnloadData();
 	}
 }
 

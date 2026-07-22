@@ -2,7 +2,7 @@
 
 struct uDirectionLight
 {
-    vec3 mDirectPos;
+    vec3 mDirection;
     vec3 mDiffuseColor;
     vec3 mSpecColor;
 };
@@ -10,7 +10,7 @@ struct uDirectionLight
 uniform vec3 uCameraPos;
 uniform vec3 uAmbientLight;
 uniform float uSpecPower;
-uniform DrectionalLigth uDirLight;
+uniform uDirectionLight uDirLight;
 
 in vec2 fragTexCoord;
 in vec3 fragWorldPos;
@@ -25,7 +25,7 @@ void main()
     vec3 N = normalize(fragNormal);
     vec3 L = normalize(-uDirLight.mDirection);
     vec3 V = normalize(uCameraPos - fragWorldPos);
-    vec3 R = normalize(reflect(-L, N))
+    vec3 R = normalize(reflect(-L, N));
 
     vec3 Phong = uAmbientLight;
     float NdotL = dot(N, L);    // 点积

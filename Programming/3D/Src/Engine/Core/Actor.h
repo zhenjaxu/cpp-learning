@@ -30,14 +30,14 @@ public:
     State GetState() const {return mState;}
     const Vector3& GetPosition() const {return mPosition;}
     float GetScale() const {return mScale;}
-    float GetRotation() const {return mRotation;}
+    const Quaternion& GetRotation() const {return mRotation;}
 
     void SetState(State state){mState=state;}
-    void SetPosition(const Vector3& pos){mPosition=pos; mRecomputeWorldTransform=true;}
-    void SetScale(float scale){mScale=scale; mRecomputeWorldTransform=true;}
-    void SetRotation(float rotation){mRotation=rotation; mRecomputeWorldTransform=true;}
+    void SetPosition(const Vector3& pos){ mPosition=pos; mRecomputeWorldTransform=true; }
+    void SetScale(float scale){ mScale=scale; mRecomputeWorldTransform=true; }
+    void SetRotation(const Quaternion& rotation){ mRotation=rotation; mRecomputeWorldTransform=true; }
 
-    Vector3 GetForward() const { return Vector3::Transform(Vector3::UintX, mRotation); }
+    Vector3 GetForward() const { return Vector3::Transform(Vector3::UnitX, mRotation); }
 
     class Game* GetGame() { return mGame; }
 

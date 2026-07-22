@@ -1,5 +1,6 @@
 #pragma once
 #include"Component.h"
+#include <SDL2/SDL.h>
 
 class SpriteComponent:public Component{
 public:

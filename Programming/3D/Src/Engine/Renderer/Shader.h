@@ -12,7 +12,10 @@ public:
               const std::string& fragName);     // 加载顶点着色器和片元着色器
     void Unload();
     void SetActive();
+    
     void SetMatrixUniform(const char* name, const Matrix4& matrix);
+	void SetVectorUniform(const char* name, const Vector3& vector);
+	void SetFloatUniform(const char* name, float value);
 
 private:
     bool CompileShader(const std::string& fileName,

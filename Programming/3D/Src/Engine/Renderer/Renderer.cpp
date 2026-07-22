@@ -1,12 +1,27 @@
 #include "Renderer.h"
 #include "VertexArray.h"
 #include "Texture.h"
+#include "Mesh.h"
+#include "MeshComponent.h"
 #include "Shader.h"
 #include "SpriteComponent.h"
 #include <GL/glew.h>
 #include <algorithm>
 
-bool Renderer::Initialize(float screenWidth, float screenHeight){
+Renderer::Renderer(Game* game)
+:mGame(game)
+,mSpriteShader(nullptr)
+,mMeshShader(nullptr)
+{}
+
+Renderer::~Renderer()
+{}
+
+bool Renderer::Initialize(float screenWidth, float screenHeight)
+{
+    mScreenWidth = screenWidth;
+	mScreenHeight = screenHeight;
+
     // 窗口创建前，请求OpenGL属性
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
@@ -29,7 +44,7 @@ bool Renderer::Initialize(float screenWidth, float screenHeight){
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 
     // 创建 OpenGL 窗口
-    mWindow=SDL_CreateWindow("TravelInSpace(2D)", 400, 100, 1024, 768, SDL_WINDOW_OPENGL);
+    mWindow=SDL_CreateWindow("Pong(3D)", 400, 100, 1024, 768, SDL_WINDOW_OPENGL);
     if(!mWindow){
         SDL_Log("Failed to create window: %s", SDL_GetError());
         return false;
@@ -60,26 +75,55 @@ bool Renderer::Initialize(float screenWidth, float screenHeight){
     return true;
 }
 
-void Renderer::Draw(){
-    Vector3 eye = mCameraActor->GetPosition();
-    Vector3 target = eye + mCameraActor->GetForward() * 10.0f;
-    mView = Matrix4::CreateLookAt(eye, target, Vector3::UnitZ);
+void Renderer::Shutdown()
+{
+	delete mSpriteVerts;
+	mSpriteShader->Unload();
+	delete mSpriteShader;
+	mMeshShader->Unload();
+	delete mMeshShader;
+	SDL_GL_DeleteContext(mContext);
+	SDL_DestroyWindow(mWindow);
+}
+
+void Renderer::UnloadData()
+{
+	for (auto i : mTextures)
+	{
+		i.second->Unload();
+		delete i.second;
+	}
+	mTextures.clear();
+
+	for (auto i : mMeshes)
+	{
+		i.second->Unload();
+		delete i.second;
+	}
+	mMeshes.clear();
+}
+
+void Renderer::Draw()
+{
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
+
     mMeshShader->SetActive();
     mMeshShader->SetMatrixUniform("uViewProj", mView * mProjection);
-
+    SetLightUniforms(mMeshShader);
     for(auto mc : mMeshComps)
     {
         mc->Draw(mMeshShader);
     }
 
-    glClearColor(0.86f, 0.86f, 0.86f, 1.0f);    // 灰色
-    glClear(GL_COLOR_BUFFER_BIT);
+    glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
 
     mSpriteShader->SetActive();
     mSpriteVerts->SetActive();
@@ -111,6 +155,17 @@ void Renderer::RemoveSprite(SpriteComponent* sprite)
 	if(iter != mSprites.end()) mSprites.erase(iter);
 }
 
+void Renderer::AddMeshComp(MeshComponent* mesh)
+{
+	mMeshComps.emplace_back(mesh);
+}
+
+void Renderer::RemoveMeshComp(MeshComponent* mesh)
+{
+	auto iter = std::find(mMeshComps.begin(), mMeshComps.end(), mesh);
+	if(iter != mMeshComps.end()) mMeshComps.erase(iter);
+}
+
 Texture* Renderer::GetTexture(const std::string& fileName)
 {
 	Texture* tex = nullptr;
@@ -135,6 +190,30 @@ Texture* Renderer::GetTexture(const std::string& fileName)
 	return tex;
 }
 
+Mesh* Renderer::GetMesh(const std::string & fileName)
+{
+	Mesh* m = nullptr;
+	auto iter = mMeshes.find(fileName);
+	if (iter != mMeshes.end())
+	{
+		m = iter->second;
+	}
+	else
+	{
+		m = new Mesh();
+		if (m->Load(fileName, this))
+		{
+			mMeshes.emplace(fileName, m);
+		}
+		else
+		{
+			delete m;
+			m = nullptr;
+		}
+	}
+	return m;
+}
+
 void Renderer::SetLightUniforms(Shader* shader)
 {
     Matrix4 invView = mView;
@@ -142,7 +221,8 @@ void Renderer::SetLightUniforms(Shader* shader)
     shader->SetVectorUniform("uCameraPos", invView.GetTranslation());   // 反转后解析相机世界空间位置
     shader->SetVectorUniform("uAmbientLight", mAmbientLight);
     shader->SetVectorUniform("uDirLight.mDirection", mDirLight.mDirection);
-    shader->SetVectorUniform("uDirLight.mDiffuseColor", mDirLight.mSpecColor);
+    shader->SetVectorUniform("uDirLight.mDiffuseColor", mDirLight.mDiffuseColor);
+	shader->SetVectorUniform("uDirLight.mSpecColor", mDirLight.mSpecColor);
 }
 
 void Renderer::CreateSpriteVerts()
@@ -163,18 +243,27 @@ void Renderer::CreateSpriteVerts()
 	mSpriteVerts = new VertexArray(vertices, 4, indices, 6);
 }
 
-bool Game::LoadShaders(){
+bool Renderer::LoadShaders()
+{
+    // 网格着色器
+    mMeshShader = new Shader();
+	if (!mMeshShader->Load("Shaders/Phong.vert", "Shaders/Phong.frag"))
+	{
+		return false;
+	}
+
     mMeshShader->SetActive();
     mView = Matrix4::CreateLookAt(Vector3::Zero, Vector3::UnitX, Vector3::UnitZ);
     mProjection = Matrix4::CreatePerspectiveFOV(Math::ToRadians(70.0f), mScreenWidth, mScreenHeight, 25.0f, 10000.0f);
-    mSpriteShader->SetMatrixUniform("uViewProj", mView * mProjection);
+    mMeshShader->SetMatrixUniform("uViewProj", mView * mProjection);
 
+    // 2D精灵着色器
     mSpriteShader= new Shader();
     if(!mSpriteShader->Load("Shaders/Sprite.vert", "Shaders/Sprite.frag")){
         return false;
     }
+
     mSpriteShader->SetActive();
-    
     // 设置 2D 的 VP 矩阵
     Matrix4 viewProj=Matrix4::CreateSimpleViewProj(1024.f, 768.f);
     mSpriteShader->SetMatrixUniform("uViewProj", viewProj);

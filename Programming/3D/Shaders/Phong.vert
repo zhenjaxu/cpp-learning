@@ -18,7 +18,7 @@ void main()
     fragWorldPos = pos.xyz;
     gl_Position = pos * uViewProj;
 
-    fragNormal = (Vec4(inNormal, 0.0f) * uWorldTransform).xyz;
+    fragNormal = (vec4(inNormal, 0.0) * uWorldTransform).xyz;
 
     fragTexCoord = inTexCoord;
 }

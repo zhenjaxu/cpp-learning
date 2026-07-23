@@ -28,7 +28,7 @@ VertexArray::VertexArray(const float* verts, unsigned int numVerts,
         reinterpret_cast<void*>(sizeof(float) * 3));
 
     // 纹理 u, v
-    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 
         reinterpret_cast<void*>(sizeof(float) * 6));
 }

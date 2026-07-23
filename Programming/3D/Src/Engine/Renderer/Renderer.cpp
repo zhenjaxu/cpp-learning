@@ -35,7 +35,7 @@ bool Renderer::Initialize(float screenWidth, float screenHeight)
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 	// 申请深度缓冲
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);	 
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);	
 
     // 请求双缓冲
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
@@ -44,7 +44,8 @@ bool Renderer::Initialize(float screenWidth, float screenHeight)
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 
     // 创建 OpenGL 窗口
-    mWindow=SDL_CreateWindow("Pong(3D)", 400, 100, 1024, 768, SDL_WINDOW_OPENGL);
+    mWindow=SDL_CreateWindow("Pong(3D)", 400, 100, 
+		static_cast<int>(mScreenWidth), static_cast<int>(mScreenHeight), SDL_WINDOW_OPENGL);
     if(!mWindow){
         SDL_Log("Failed to create window: %s", SDL_GetError());
         return false;
@@ -105,7 +106,7 @@ void Renderer::UnloadData()
 
 void Renderer::Draw()
 {
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glEnable(GL_DEPTH_TEST);
@@ -122,8 +123,7 @@ void Renderer::Draw()
     glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 
-    glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
-	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     mSpriteShader->SetActive();
     mSpriteVerts->SetActive();
@@ -227,12 +227,12 @@ void Renderer::SetLightUniforms(Shader* shader)
 
 void Renderer::CreateSpriteVerts()
 {
-    // x, y, z, u, v 三角形顶点坐标和对应的纹理坐标
-	float vertices[] = {  
-		-0.5f,  0.5f, 0.f, 0.f, 0.f,
-		 0.5f,  0.5f, 0.f, 1.f, 0.f,
-		 0.5f, -0.5f, 0.f, 1.f, 1.f,
-		-0.5f, -0.5f, 0.f, 0.f, 1.f
+    // x, y, z, nx, ny, nz, u, v 顶点坐标、法线和纹理坐标
+	float vertices[] = {
+		-0.5f,  0.5f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f,
+		 0.5f,  0.5f, 0.f, 0.f, 0.f, 1.f, 1.f, 0.f,
+		 0.5f, -0.5f, 0.f, 0.f, 0.f, 1.f, 1.f, 1.f,
+		-0.5f, -0.5f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f
 	};
 
 	unsigned int indices[] = {
